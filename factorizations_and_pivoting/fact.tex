@@ -1,0 +1,411 @@
+\documentclass[9pt, serif]{beamer}
+
+\newlength{\wideitemsep}
+\setlength{\wideitemsep}{\itemsep}
+%\addtolength{\wideitemsep}{9pt}
+\let\olditem\item
+\renewcommand{\item}{\setlength{\itemsep}{\wideitemsep}\olditem}
+
+% This file is a solution template for:
+
+% - Talk at a conference/colloquium.
+% - Talk length is about 20min.
+% - Style is ornate.
+
+\usepackage[noend]{algpseudocode}
+\usepackage{psfrag}
+\usepackage{graphics}
+\usepackage{marvosym}
+\usepackage{latexsym}
+\usepackage{amsfonts}
+\usepackage{amsmath}  
+\usepackage{bm}
+\usepackage{epstopdf}
+\usepackage{tikz}
+\usetikzlibrary{arrows,matrix,positioning}
+
+\newcommand{\bi}{\begin{itemize}}
+\newcommand{\be}{\begin{enumerate}}
+\newcommand{\ei}{\end{itemize}}
+\newcommand{\ee}{\end{enumerate}}
+\newcommand*\Let[2]{\State #1 $\gets$ #2}
+\newcommand{\abs}[1]{\left|#1\right|}
+
+\newcommand{\bfr}[1]{\begin{frame}{\hspace{50mm}#1}}
+\newcommand{\efr}{\end{frame}}
+
+\definecolor{royalblue}{rgb}{.2,.6,1}%
+\definecolor{mygrey}{rgb}{.64,.64,.64}%
+\definecolor{mywhite}{rgb}{1,1,1}%
+\definecolor{mypurple}{rgb}{.8,.6,1}%
+
+\definecolor{red}{rgb}{1,0,0}
+\definecolor{skyblue}{rgb}{0.1960, 0.6000, 0.8000}
+
+
+\mode<presentation>
+{
+% THEME CHOICES
+%\usetheme{CambridgeUS}
+\usetheme{Warsaw}
+%\usetheme{Rochester}
+%\usetheme{Bergen}
+%\usetheme{Berlin}
+%\usetheme{Copenhagen}
+%\usetheme{Boadilla}
+%\usetheme{PaloAlto}
+
+% SET BACKGROUND COLORS
+
+\setbeamercolor{background canvas}{bg=white}
+\setbeamerfont{frametitle}{size=\large}
+}
+
+\setbeamercolor{frame}{bg=mygold}
+
+\usepackage[english]{babel}
+
+\usepackage[latin1]{inputenc}
+
+\usepackage{helvet}
+\usepackage[T1]{fontenc}
+\title[Factorizations and Pivoting]
+{The Cholesky Factorization and \\Pivoting Methods in Gaussian Elimination}
+
+
+
+\author[]
+{Nate DeMaagd, Kurt O'Hearn}
+
+
+\institute[Grand Valley State University]
+{MTH 499-02}
+  
+\date{March 11, 2013}
+
+
+% If you have a file called "university-logo-filename.xxx", where xxx
+% is a graphic format that can be processed by latex or pdflatex,
+% resp., then you can add a logo as follows:
+
+\pgfdeclareimage[height=1cm, width=1cm]{GVlogo}{GVSULOGOBLACK}
+ \logo{\pgfuseimage{GVlogo}}
+
+% to mask background in logo image
+% \pgfdeclaremask{logobacking}{image name }
+%
+
+
+% Delete this, if you do not want the table of contents to pop up at
+% the beginning of each subsection:
+%\AtBeginSubsection[]
+%{
+ % \begin{frame}<beamer>{Outline}
+ %   \tableofcontents[currentsection,currentsubsection]
+ % \end{frame}
+%}
+
+
+% If you wish to uncover everything in a step-wise fashion, uncomment
+% the following command:
+
+%\beamerdefaultoverlayspecification{<+->}
+
+\begin{document}
+
+\begin{frame}
+    \titlepage
+\end{frame}
+
+\begin{frame}{Outline}
+    \bi
+        \item Cholesky factorization: overview, algorithm, example \pause
+        \item Pivoting methods in Gaussian Elimination: connections to factorizations, types, example
+    \ei
+\end{frame}
+
+%CHOLESKY FACTORIZATION OVERVIEW
+\begin{frame}{The Cholesky Factorization}
+The Cholesky Factorization \pause
+\bi
+\item Given $A$, we can write $A$ as  $A=LL^T$ with $L$ lower triangular\pause
+\item Necessary conditions on $A$:\pause
+	\bi \item Real-valued entries $(A \in \mathbb{R}^{n\text{x}n})$
+	\item Symmetric $(A = A^T)$
+	\item Positive definite $(x^TAx > 0$ for all $x \in \mathbb{R}^n$, $x \ne 0_n)$ \pause
+	\ei
+\item Cholesky: special case of $LU$-factorization\pause
+\item Why are factorizations important?  Connections later in pivoting \pause
+\ei
+\end{frame}
+
+
+%CHOLESKY THM PF
+\begin{frame}{Cholesky: Proof Overview}
+\begin{theorem}
+	If $A$ is a real, symmetric, and positive definite matrix, then $A=LL^T$ for a unique upper triangular $L$. \pause
+\end{theorem}
+\begin{proof}
+    Existence: \pause
+    \bi 
+    	\item $A$ positive definite $\Rightarrow$ $A$ nonsingular \pause 
+		\item Leading principle minors of $A$ positive definite \\$\Rightarrow$ principle minors nonsingular $\Rightarrow$ $A=LU$ ($LU$ factorization exists) \pause
+		\item $LU = A = A^T = U^TL^T \Leftrightarrow U(L^T)^{-1} = L^{-1}U^T$ \pause
+		\item $U(L^T)^{-1}$ upper triangular, $L^{-1}U^T$ lower triangular \\$\Rightarrow$ both sides diagonal $(D)$ \pause
+        \item $U=DL^T$ \pause
+	    \item $D$ has positive diagonal entries $\Rightarrow$ $D = D^{1/2}D^{1/2}$ \pause
+		\item $A = L^*(L^*)^T$, where $L^* = LD^{1/2}$
+    \ei \pause
+    Unicity: straightforward (assume two, show same)
+\end{proof}
+\end{frame}
+
+
+\begin{frame}{Cholesky Algorithm}
+ \begin{algorithmic}[1]
+        \Function{Cholesky}{$n, (a_{ij})$}
+            \For{$k = 1 \textbf{ to } n$}
+                \Let{$l_{kk}$}{$\left(a_{kk}-\sum\limits_{s=1}^{k-1}l_{ks}^2\right)^{1/2}$}
+                \For{$i = k + 1 \textbf{ to } n$}
+                    \Let{$l_{ik}$}{$\left(a_{ik}-\sum\limits_{s=1}^{k-1}l_{is}l_{ks}\right)/l_{kk}$}
+                \EndFor
+            \EndFor
+            \vspace{-5mm}
+            \State \Return{$(l_{ij})$}
+        \EndFunction
+    \end{algorithmic}
+    \vspace{2mm}
+    where
+    \vspace{2mm}
+    \bi
+        \item $A = (a_{ij})$: factored matrix
+        \item $n$: order of $A$
+        \item $L = (l_{ij})$: resulting lower triangular matrix
+    \ei
+\end{frame}
+
+%CHOLESKY EXAMPLE SLIDE 1
+\begin{frame}{Example of Cholesky Algorithm}
+    
+\begin{columns}
+	\column{.35\textwidth} 
+	$A=\begin{bmatrix}
+	25 & 15 & $-5$ \\
+	15 & 18 & 0 \\
+	$-5$ & 0 & 11
+	\end{bmatrix}$
+
+\vspace{8mm}
+
+	$L=\begin{bmatrix}
+ 	\visible<2->{5}& 0 & 0\\
+ 	\visible<3->{3}& \visible<5->{3}& 0\\
+	 \visible<4->{$-1$} & \visible<6->{1} & \visible<7->{3} \end{bmatrix}$
+
+\column{.65\textwidth}	
+ \begin{algorithmic}[1]
+        \Function{Cholesky}{$n, (a_{ij})$}
+            \For{$k = 1 \textbf{ to } n$}
+                \Let{$l_{kk}$}{$\left(a_{kk}-\sum\limits_{s=1}^{k-1}l_{ks}^2\right)^{1/2}$}
+                \For{$i = k + 1 \textbf{ to } n$}
+                    \Let{$l_{ik}$}{$\left(a_{ik}-\sum\limits_{s=1}^{k-1}l_{is}l_{ks}\right)/l_{kk}$}
+                \EndFor
+            \EndFor
+            \vspace{-5mm}
+            \State \Return{$(l_{ij})$}
+        \EndFunction
+    \end{algorithmic}
+\end{columns}
+
+\vspace{8mm}
+
+\begin{center}
+\only<2-2>{$k=1:$\\[3mm] $l_{11} = (25 - 0)^{1/2} = 5$}
+\only<3-3>{$k=1,\quad i=2:$\\[3mm] $l_{21} = (15 - 0)/5 = 3$}
+\only<4-4>{$k=1,\quad i=3:$\\[3mm] $l_{31} = (-5-0)/5 = -1$}
+\only<5-5>{$k=2:$\\[3mm] $l_{22} = (18-3^2)^{1/2} = 3$}
+\only<6-6>{$k=2,\quad i=3:$\\[3mm] $l_{32} = \left(0-(-1)(3)\right)/3 = 1$}
+\only<7-7>{$k=3:$\\[3mm] $l_{33} = \left(11-(-1)^2-(-1)^2\right) = 3$}
+\end{center}
+\end{frame}
+
+
+%CHOLESKY EXAMPLE SLIDE 2
+\begin{frame}{Example of Cholesky Algorithm Cont.}
+\bi
+\item Verify correctness:
+\ei
+$$L = \begin{bmatrix} 5 & 0 & 0 \\ 3 & 3 & 0 \\ $-1$ & 1 & 3 \end{bmatrix}
+\pause\Longrightarrow
+L^T = \begin{bmatrix} 5 & 3 & $-1$ \\ 0 & 3 & 1 \\ 0 & 0 & 3 \end{bmatrix}$$
+\pause
+\vspace{5mm}
+$$LL^T = \begin{bmatrix} 5 & 0 & 0 \\ 3 & 3 & 0 \\ $-1$ & 1 & 3 \end{bmatrix}\begin{bmatrix} 5 & 3 & $-1$ \\ 0 & 3 & 1 \\ 0 & 0 & 3 \end{bmatrix}
+=\begin{bmatrix}
+25 & 15 & $-5$ \\
+15 & 18 & 0 \\
+$-5$ & 0 & 11
+\end{bmatrix} = A$$
+\end{frame}
+
+
+\begin{frame}{Gaussian Elimination: Overview}
+    Gaussian Elimination \pause
+    \bi
+        \item Process which attempts to solve a linear system by reducing the coefficient matrix to triangular form using elementary row operations (the result can then by easily solved using forward/backward substitution) \pause
+        \item Possible row operations:
+        \bi
+            \item Interchange
+            \item Scaling
+            \item Addition
+        \ei \pause
+        \item Gaussian elimination only utilizes scaling and addition!
+    \ei
+\end{frame}
+
+
+\begin{frame}{Gaussian Elimination Algorithm}
+    \begin{algorithmic}[1]
+        \Function{GE}{$n, (a_{ij})$}
+            \For{$k = 1 \textbf{ to } n-1$}
+                \For{$i = k + 1 \textbf{ to } n$}
+                    \Let{$z$}{$a_{ik}/a_{kk}$}
+                    \Let{$a_{ik}$}{$0$}
+                    \For{$j = k + 1 \textbf{ to } n$}
+                        \Let{$a_{ij}$}{$a_{ij}-za_{kj}$}
+                    \EndFor
+                \EndFor
+            \EndFor
+            \vspace{-5mm}
+            \State \Return{$(a_{ij})$}
+        \EndFunction
+    \end{algorithmic}
+\end{frame}
+
+
+\begin{frame}{Gaussian Elimination and Factorizations}
+    \bi
+        \item Recall: row operations are equivalent to left multiplication of coefficient matrix by elementary matrices \pause
+        \bi
+            \item Example: scale row 2 of $A \in \mathbb{R}^{3\text{x}3}$ by 4 $$EA,\quad E = \begin{bmatrix}1&0&0\\0&4&0\\0&0&1\end{bmatrix}$$
+        \ei \pause
+        \item Define G.E. recursively in terms of multiplication by these matrices: $$A_{k+1} = E_kA_k$$ \vspace{-5mm} \pause
+        \item Note that algorithm terminates after $s = T_n$ operations with $A_{n\text{x}n}$ \pause
+        \item Define $U = A_{s+1}$ and observe that $$U = E_s\cdots E_1A \quad \text{or} \quad A = E^{-1}_1\cdots E^{-1}_sU = LU$$ \vspace{-5mm} \pause
+        \item So, Gaussian elimination constructs an $LU$ factorization (and hence is functionally equivalent to the $LU$ factorization algorithm!)
+    \ei
+\end{frame}
+
+
+\begin{frame}{Gaussian Elimination: Pivoting Methods}
+    Pivoting Methods \pause
+    \bi
+        \item Problem: Gaussian elimination breaks down (spectacular examples pg. 167--169) \pause
+        \item Solution: incorporate row interchange operations via permutation matrix (we call this pivoting) \pause
+        \item Types of pivoting:
+        \bi
+            \item Partial/complete: pertains to the amount of the matrix examined to find where to pivot \pause
+            \bi
+                \item Partial: analyze one row
+                \item Complete: analyze entire submatrix
+            \ei \pause
+            \item Unscaled/scaled: pertains to how the potential pivot locations are compared \pause
+            \bi
+                \item Unscaled: compare absolute value of entries directly
+                \item Scaled: compare ratios of pivot entries to maximum entries in magnitude in each row
+            \ei
+        \ei
+    \ei
+\end{frame}
+
+
+\begin{frame}{Pivoting Algorithms}
+    \begin{algorithmic}[1]
+        \Function{GE\_PP}{$n, (a_{ij}), (p_{i})$}
+            \For{$k = 1 \textbf{ to } n-1$}
+                \For{$i = k + 1 \textbf{ to } n$}
+                    \Let{$z$}{$a_{p_ik}/a_{p_kk}$}
+                    \Let{$a_{p_ik}$}{$0$}
+                    \For{$j = k + 1 \textbf{ to } n$}
+                        \Let{$a_{p_ij}$}{$a_{p_ij}-za_{p_kj}$}
+                    \EndFor
+                \EndFor
+            \EndFor
+            \vspace{-5mm}
+            \State \Return{$(a_{ij})$}
+        \EndFunction
+    \end{algorithmic}
+\end{frame}
+
+
+\begin{frame}{Pivoting Examples}
+    \begin{columns}
+    \column{.35\textwidth}
+        \only<1-2>{
+            $A_1=\begin{bmatrix}
+            1 & 3 & 6 \\
+            2 & 1 & 1 \\
+            1 & 3 & 3
+            \end{bmatrix}$
+        }
+        \only<3-5>{
+            $A_2=\begin{bmatrix}
+            0 & 2.5 & 5.5 \\
+            1 & 0.5 & 0.5 \\
+            0 & 2.5 & 2.5
+            \end{bmatrix}$
+        }
+        \only<6-7>{
+            $A_3=\begin{bmatrix}
+            0 & 1 & 2.2 \\
+            1 & 0.5 & $-0.6$ \\
+            0 & 0 & $-3$
+            \end{bmatrix}$
+        }
+        \only<8-8>{
+            $A_4=\begin{bmatrix}
+            0 & 1 & 2.2 \\
+            1 & 0.5 & $-0.6$ \\
+            0 & 0 & 1
+            \end{bmatrix}$
+        }
+        \vspace{5mm}
+        \only<1-1>{
+            $p = \begin{bmatrix}1,&2,&3\end{bmatrix}$
+        }
+        \only<2-8>{
+            $p = \begin{bmatrix}2,&1,&3\end{bmatrix}$
+        }
+
+    \column{.65\textwidth}
+        \begin{algorithmic}[1]
+            \Function{GE\_PP}{$n, (a_{ij}), (p_{i})$}
+                \For{$k = 1 \textbf{ to } n-1$}
+                    \For{$i = k + 1 \textbf{ to } n$}
+                        \Let{$z$}{$a_{p_ik}/a_{p_kk}$}
+                        \Let{$a_{p_ik}$}{$0$}
+                        \For{$j = k + 1 \textbf{ to } n$}
+                            \Let{$a_{p_ij}$}{$a_{p_ij}-za_{p_kj}$}
+                        \EndFor
+                    \EndFor
+                \EndFor
+                \vspace{-5mm}
+                \State \Return{$(a_{ij})$}
+            \EndFunction
+        \end{algorithmic}
+    \end{columns}
+
+    \vspace{8mm}
+
+    \only<1-3>{$$\max(\abs{1},\abs{2},\abs{1}) = 2$$}
+    \only<2-3>{$$R_1 \leftarrow R_1 - \frac{1}{2}R_2$$}
+    \only<2-3>{$$R_3 \leftarrow R_3 - \frac{1}{2}R_2$$}
+    \only<2-3>{$$R_2 \leftarrow \frac{1}{2}R_2$$}
+    \only<4-6>{$$\max(\abs{2.5},\abs{2.5}) = 2.5$$}
+    \only<5-6>{$$R_3 \leftarrow R_3 - R_2$$}
+    \only<5-6>{$$R_1 \leftarrow \frac{2}{5}R_1$$}
+    \only<7-8>{$$R_3 \leftarrow -\frac{1}{3}R_3$$}
+\end{frame}
+
+
+\end{document}

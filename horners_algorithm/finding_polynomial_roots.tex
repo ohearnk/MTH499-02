@@ -1,0 +1,348 @@
+\documentclass[9pt, serif]{beamer}
+
+% This file is a solution template for:
+
+% - Talk at a conference/colloquium.
+% - Talk length is about 20min.
+% - Style is ornate.
+
+\usepackage{psfrag}
+\usepackage{graphics}
+\usepackage{latexsym}
+\usepackage{amsfonts}
+\usepackage{amsmath}  
+\usepackage{bm}
+\usepackage{epstopdf}
+\usepackage[noend]{algpseudocode}
+\usepackage[english]{babel}
+\usepackage[latin1]{inputenc}
+\usepackage{helvet}
+\usepackage[T1]{fontenc}
+
+\newcommand{\bi}{\begin{itemize}}
+\newcommand{\ei}{\end{itemize}}
+\newcommand{\be}{\begin{enumerate}}
+\newcommand{\ee}{\end{enumerate}}
+\newcommand{\beq}{\begin{equation}}
+\newcommand{\eeq}{\end{equation}}
+\newcommand{\beqs}{\begin{equation*}}
+\newcommand{\eeqs}{\end{equation*}}
+\newcommand*\Let[2]{\State #1 $\gets$ #2}
+
+\definecolor{royalblue}{rgb}{.2,.6,1}%
+\definecolor{mygrey}{rgb}{.64,.64,.64}%
+\definecolor{mywhite}{rgb}{1,1,1}%
+\definecolor{mypurple}{rgb}{.8,.6,1}%
+
+\definecolor{red}{rgb}{1,0,0}
+\definecolor{skyblue}{rgb}{0.1960, 0.6000, 0.8000}
+
+
+\mode<presentation>
+{
+	% THEME CHOICES
+%	\usetheme{CambridgeUS}
+	\usetheme{Warsaw}
+%	\usetheme{Rochester}
+%	\usetheme{Bergen}
+%	\usetheme{Berlin}
+%	\usetheme{Copenhagen}
+%	\usetheme{Boadilla}
+%	\usetheme{PaloAlto}
+	% SET BACKGROUND COLORS
+	\setbeamercolor{background canvas}{bg=white}
+	\setbeamerfont{frametitle}{size=\large}
+	\setbeamercolor{frame}{bg=mygold}
+}
+
+
+\title[Secant method]{Horner's Method and Finding Roots of Polynomials}
+\author[]{Nate DeMaagd, Kurt O'Hearn}
+\institute[Grand Valley State University]{MTH 499-02}
+\date{February 18, 2013}
+
+
+% If you have a file called "university-logo-filename.xxx", where xxx
+% is a graphic format that can be processed by latex or pdflatex,
+% resp., then you can add a logo as follows:
+
+\pgfdeclareimage[height=1cm, width=1cm]{GVlogo}{GVSULOGOBLACK}
+ \logo{\pgfuseimage{GVlogo}}
+
+% to mask background in logo image
+% \pgfdeclaremask{logobacking}{image name }
+%
+
+
+% Delete this, if you do not want the table of contents to pop up at
+% the beginning of each subsection:
+%\AtBeginSubsection[]
+%{
+ % \begin{frame}<beamer>{Outline}
+ %   \tableofcontents[currentsection,currentsubsection]
+ % \end{frame}
+%}
+
+
+% If you wish to uncover everything in a step-wise fashion, uncomment
+% the following command:
+
+%\beamerdefaultoverlayspecification{<+->}
+
+\begin{document}
+
+\begin{frame}
+	\titlepage
+\end{frame}
+
+%\begin{frame}{Outline}
+ % \tableofcontents
+  % You might wish to add the option [pausesections]
+%\end{frame}
+
+
+\begin{frame}{\hspace{50mm}Introduction}
+    \LARGE{Our outline for today is\ldots }
+    \pause
+    \bi
+        \item Development of Horner's Algorithm
+        \pause
+        \item Pseudocode
+        \pause
+        \item Applications and Connections to Root Finding
+        \pause
+        \item Related Ideas: Julia Sets and Fractals
+    \ei
+\end{frame}
+
+
+\begin{frame}{Development of Horner's Algorithm}
+    Horner's Algorithm (Polynomials)
+    \bi
+\item Consider a polynomial $p$ with degree $n$ and some point $x_0$.
+    We form the degree $n-1$ polynomial $q$ as: 
+        \begin{align*} 
+        		q(x)=\dfrac{p(x)-p(x_0)}{x-x_0}.
+	\end{align*}
+	\pause
+\item Rearranging, we have
+	\beq \label{EQ:1}
+		p(x)=(x-x_0)q(x)+p(x_0).
+	\eeq
+    \pause
+\item Expanding $p$ and $q$:
+	\begin{align*}
+		p(x)&=a_0+a_1x+a_2x^2+\dots+a_{n-2}x^{n-2}+a_{n-1}x^{n-1}+a_n x^n \\
+		q(x)&=b_0+b_1x+b_2x^2+\dots+b_{n-2}x^{n-2}+b_{n-1}x^{n-1}.
+	\end{align*}
+    \ei
+\end{frame}
+
+
+
+\begin{frame}{Development of Horner's Algorithm Cont.}
+\bi
+    \item Equating like coefficients in \eqref{EQ:1}, we have
+    \pause
+    \begin{align*}
+    	\text{constant}:\quad& p(x_0)=a_0+b_0x_0\\
+	    x:\quad& b_0=a_1+b_1x_0\\
+    	x^2:\quad& b_1=a_2+b_2x_0\\
+	    \phantom{x:}\quad& ~\vdots\\
+    	x^{n-1}:\quad& b_{n-2}=a_{n-1}+b_{n-1}x_0\\
+	    x^n:\quad& b_{n-1}=a_n.
+    \end{align*}
+    \pause
+    \item Notice: repeated substitution starting with $b_{n-1}$ to find all $b_j$ and $p(x_0)$
+    \pause
+    \item Question: why should we care?
+\ei
+\end{frame}
+
+
+\begin{frame}{Horner's Algorithm: Pseudocode}
+    % go check out minted and listing packages
+    \begin{algorithmic}[1]
+        \Function{Horner}{$n, [a_0, \ldots, a_n], x_0$}
+	 \Let{$b_{n-1}$}{$a_n$}
+            \For{$k = 0 \textbf{ to } n-1 \textbf{ step } -1$}
+                \Let{$b_{k-1}$}{$a_k+b_k x_0$}
+            \EndFor
+            \State \Return{$[b_{-1}, \ldots, b_{n-1}]$}
+        \EndFunction
+    \end{algorithmic}
+    \vspace{5mm}
+    where \\
+    \bi
+	\item[] $n$: degree of $p$
+	\item[] $a_i$: coefficients of $i^{\text{th}}$ degree term in $p$ (degree $n$)
+	\item[] $b_j$: coefficients of $j^{\text{th}}$ degree term in $q$ (degree $n-1$)
+	\item[] $x_0$: evaluation point
+    \ei
+\end{frame}
+
+
+\begin{frame}{Significance of Horner's Method}
+    Applications
+    \pause
+    \bi
+        \item Function evaluation and Deflation \pause
+        \item Taylor Expansions \pause
+        \item Newton's method
+    \ei
+\end{frame}
+
+
+\begin{frame}{Application: Function Evaluation and Deflation}
+	\bi
+		\item Recall: Given $p$ (degree $n$) and some $x_0$, Horner's algorithm finds all coefficients $b_j$
+		of $q$ (degree $n-1$) and $p(x_0)$
+		\pause
+		\item Example: Deflate \vspace{-2mm} $$p(x) = x^3 - 2x^2 - 5x + 6, \quad x_0 = -1$$
+		\pause
+		\vspace{-5mm} \item Use synthetic division table:
+		\pause
+	\ei
+		\begin{table}
+			\centering
+			\begin{tabular}{r | r r r r r r}
+				& $a_n$ & $a_{n-1}$ & $a_{n-2}$ & $\cdots$ & $a_1$ & $a_0$ \\
+				$x_0$ &   & $a_n x_0$ & $b_{n-1} x_0$ & $\cdots$ & $b_1 x_0$ & $b_0 x_0$ \\
+				\hline
+	   			& $a_n$ & $a_{n-1}+a_n x_0$ & $a_{n-2}+b_{n-1} x_0$ & $\cdots$ & $a_1+b_1 x_0$ & $a_0+b_0 x_0$
+			\end{tabular}
+	\end{table}
+	\pause
+	\begin{table}
+		\centering
+		\begin{tabular}{r | r r r r}
+	   		& 1 & -2 & -5 & 6 \\
+			-1 &    & \visible<7->{-1} & \visible<9->3 & \visible<11->2 \\
+			\hline
+	   		& \visible<6->1 & \visible<8->{-3} & \visible<10->{-2} & \visible<12->8
+		\end{tabular}
+	\end{table}
+	\pause
+	\bi
+		\item<13-> Thus, $p(x) = (x+1)(x^2-3x-2)+8$
+	\ei
+\end{frame}
+
+
+%TAYLOR EXPANSION
+\begin{frame}{Application: Taylor Expansion}
+\bi
+\item Consider: $n$ term Taylor expansion of $p(x)$ about $x = x_0$: \pause
+	\beqs
+		p(x) = p(x_0) + \frac{p'(x_0)}{1!}(x-x_0) + \ldots + \frac{p^{(n)}(x_0)}{n!}(x-x_0)^n
+	\eeqs \pause
+\vspace{-5mm} \item Relabeling coefficients, we have \pause
+	\beqs
+		p(x) = c_n(x-x_0)^n+c_{n-1}(x-x_0)^{n-1}+\dots+c_0
+	\eeqs \pause
+\vspace{-5mm} \item Now, observe that repeatedly deflating $p$ at $x_0$ yields \pause
+	\begin{align*}
+		p(x)&=(x-x_0)q_1(x)+p(x_0)\\
+		\visible<3->{&=(x-x_0)[(x-x_0)q_2(x)+q_1(x_0)]+p(x_0)\\}
+		\visible<4->{&~~~~~~~~~~~~~~~~\vdots\\}
+		\visible<5->{&=\sum_{i=1}^n \left[(x-x_0)^iq_i(x_0)\right]+p(x_0).}
+	\end{align*}
+	\pause
+\vspace{-5mm} \item<6-> Thus, the remainder terms from Horner's method are the coefficients we seek!
+\ei
+\end{frame}
+
+
+%\begin{frame}
+%\bi
+%\item Base step: Horner's algorithm gives $c_0=p(x_0)$.
+%	\pause
+%\item Second coefficient, $c_1$, found applying the algorithm again:
+%	\begin{align*}
+%		q(x)=c_n(x-x_0)^{n-1}+c_{n-1}(x-x_0)^{n-2}+\dots+c_1.
+%	\end{align*}
+%	\pause
+%\item Repeat until all coefficients found.
+%\ei
+%\end{frame}
+
+
+%TAYLOR EXAMPLE
+\begin{frame}{Application: Taylor Expansion Cont.}
+\bi
+\item Example: Consider $$f(x)=x^3-2x^2-5x+6.$$
+	Find Taylor expansion centered at $x=2$.
+	\pause
+
+\begin{columns}
+\column{.33\textwidth}
+\begin{table}\onslide<2->
+\caption{Finding $c_0$}
+		\centering
+	\begin{tabular}{r | r r r r}
+	   & 1 & -2 & -5 & 6 \\
+	2 &    &  2 & 0 & -10 \\
+	\hline
+	   & 1 & 0 & -5 & \bf{-4}
+	\end{tabular}
+	\end{table}
+\column{.33\textwidth}
+\begin{table}\onslide<3->
+\caption{Finding $c_1$}
+		\centering
+	\begin{tabular}{r | r r r}
+	   & 1 & 0 & -5  \\
+	2 &    &  2 & 4 \\
+	\hline
+	   & 1 & 2 &\bf{-1}
+	\end{tabular}
+	\end{table}
+\column{.33\textwidth}
+\begin{table}\onslide<4->
+\caption{Finding $c_2$}
+		\centering
+	\begin{tabular}{r | r r}
+	   & 1 & 2 \\
+	2 &    &  2 \\
+	\hline
+	   & 1 & \bf{4} 
+	\end{tabular}
+	\end{table}
+\end{columns}
+    	\pause
+	\item<5-> So, the Taylor expansion centered at $x=2$ is
+	\visible<6->{
+		$$f(x)=(x-2)^3+4(x-2)^2-(x-2)-4.$$
+	}
+	\ei
+\end{frame}
+
+
+\begin{frame}{Application: Newton's Method}
+	\bi
+		\item Recall: Newton's method is defined as $$x_{n+1} = x_n - \frac{f(x_n)}{f'(x_n)}$$
+		\pause
+		\item If $f$ is a polynomial, use H.A. to evaluate $f(x_n)$ and $f'(x_n)$
+		\pause
+		\item How: H.A. can evaluate functions and Taylor series!
+		\pause
+		\item Code: evaluate both points simultaneously (pg. 115)
+	\ei
+\end{frame}
+
+
+\begin{frame}{Extension: Julia Sets and Fractals}
+	\bi
+		\item Consider $p$ and its roots $\xi_i$
+		\pause
+		\item Basin of attraction of $\xi_i$: set of all points which converge to $\xi_i$ when iterated (say, by N.M.)
+		\pause
+		\item Question: what about the points that don't converge to any root?
+		\pause
+		\item Answer: form Julia set
+		\pause
+		\item Demo!
+	\ei
+\end{frame}
+
+\end{document}
