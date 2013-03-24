@@ -71,7 +71,7 @@
 \usepackage{helvet}
 \usepackage[T1]{fontenc}
 \title[Norms and Error Analysis]
-{Learning to Measure Before Iterating:\\Norms and Error Analysis}
+{You Perturb It, You Pay According to $\mathcal{K}(A)$:\\Norms and Error Analysis}
 
 
 
@@ -121,7 +121,7 @@
 \begin{frame}{Outline}
     \bi
         \item Norms: properties, types, examples \pause
-        \item Theorems on norms \pause
+        \item Theorems, results on norms \pause
         \item Relative/absolute error in perturbations, conditioning number
     \ei
 \end{frame}
@@ -129,47 +129,46 @@
 
 %Definition of Norm
 \begin{frame}{Vector Norms}
-
-Norm Definition
+    \pause
+    \begin{definition}
+        Let $V$ be a vector space.  A norm is a function $\norm{\cdot}: V \to \mathbb{R}^+$ that
+        has the following properties:
+        \bi
+            \item $\norm{x}>0$ if $x\neq0,~x\in V$
+            \item $\norm{\lambda x} = \abs{\lambda}~\norm{x}$ if $\lambda\in\mathbb{R},~x\in V$
+            \item $\norm{x+y}\leq\norm{x} + \norm{y}$ for all $x,y \in V$ (triangle inequality)
+        \ei
+    \end{definition} \pause
+    Other comments:
 \bi
-    \item Norm is a function $||\cdot||$ that maps from vector space $V$ to $\mathbb{Z}^+$. It obeys:
-    \pause
-    \bi
-        \item $||x||>0$ if $x\neq0,~x\in V$
-        \pause
-        \item $||\lambda x|| = |\lambda|~||x||$ if $\lambda\in\mathbb{R},~x\in V$
-        \pause
-        \item the Triangle Inequality, $||x+y||\leq||x|| + ||y||$ if $x,y\in V$.
-        \pause
-    \ei
-    \item Generalizes idea of absolute value.
-    \pause
-    \item Think of norm as length of vector.
+    \item Norm can be thought of as generalization of absolute value
+    \item Interpretation: vector length in $\mathbb{R}^2$, $\mathbb{R}^3$
 \ei
 \end{frame}
 
 
 %TYPES OF NORMS IN TABLE FORM
 \begin{frame}{Types of Norms}
-\bi
+    \pause
+    Vector Norms:
+    \pause
+    \bi
+    \item $l_k$ norm
+        \begin{align*}
+            l_k = \norm{x}_k = \left(\sum\limits_{i=1}^n \abs{x_i}^k\right)^{1/k}~\text{where}~k\in\{1,2,\dots\}~\text{and}~x=(x_1,\dots,x_n)^T
+        \end{align*}
+    \pause
 
-\item Defined generally,
-    \begin{align*}
-        l_k = ||x||_k = \left(\sum\limits_{i=1}^n |x_i|^k\right)^{1/k}~\text{where}~k\in\{1,2,\dots\}~\text{and}~x=(x_1,\dots,x_n)^T
-    \end{align*}
-\pause
-
-\item Some common norms are
+\item Some common instances of the $l_k$ norm:
 \begin{table}[H]
         \centering
     \begin{tabular}{c | l}
 
      $k$ & $l_k$ \\
      \hline
-     1 & $||x||_1 = \sum\limits_{i=1}^n |x_i|$ \\
-     2 & $||x||_2=\left(\sum\limits_{i=1}^n x_i^2\right)^{1/2}$ \\
-    $\vdots$ & $\vdots$ \\
-    $\infty$ & $||x||_\infty = \smash{\displaystyle\max_{1 \leq i \leq n}} |x_i|$
+     1 & $\norm{x}_1 = \sum\limits_{i=1}^n \abs{x_i}$ \\
+     2 & $\norm{x}_2=\left(\sum\limits_{i=1}^n x_i^2\right)^{1/2}$ \\
+    $\infty$ & $\norm{x}_\infty = \smash{\displaystyle\max_{1 \leq i \leq n}} \abs{x_i}$
     \end{tabular}
     \end{table}
 
@@ -179,107 +178,95 @@ Norm Definition
 
 %VECTOR NORM EXAMPLES
 \begin{frame}{Examples of Vector Norms}
-\bi
+    \bi
+        \item Consider vectors in $\mathbb{R}^3$
+        \begin{align*}
+            x = (2,-1,3)^T~~~~~ y = (7,2,5)^T~~~~~ z = (-3,1,-9)^T
+        \end{align*}
 
-\item Consider vectors in $\mathbb{R}^3$
-\begin{align*}
-    x = (2,-1,3)^T~~~~~ y = (7,2,5)^T~~~~~ z = (-3,1,-9)^T
-\end{align*}
+        \begin{table}[H]
+            \centering
+            \begin{tabular}{c || c c c}
+                & $||\cdot||_1$ & $||\cdot||_2$ & $||\cdot||_\infty$ \\
+                \hline
+                \hline
+                $x$ & \visible<2->{6} & \visible<3->{3.74} & \visible<4->{3} \\
+                $y$ & \visible<5->{14} & \visible<5->{8.83} & \visible<5->{7} \\
+                $z$ & \visible<5->{13} & \visible<5->{9.54} & \visible<5->{9} \\
+            \end{tabular}
+        \end{table}
 
-\begin{table}[H]
-        \centering
-    \begin{tabular}{c || c c c}
+        \vspace{4mm}
 
-      & $||\cdot||_1$ & $||\cdot||_2$ & $||\cdot||_\infty$ \\
-      \hline
-      \hline
-      $x$ & \visible<2->{6} & \visible<3->{3.74} & \visible<4->{3} \\
-      $y$ & \visible<5->{14} & \visible<5->{8.83} & \visible<5->{7} \\
-      $z$ & \visible<5->{13} & \visible<5->{9.54} & \visible<5->{9} \\
-    \end{tabular}
-    \end{table}
-
-\vspace{4mm}
-
-\only<2-2>{\centering{$||x||_1 = 2 + 1 +3 = 6$}}
-\only<3-3>{\centering{$||x||_2 = \sqrt{2^2 + 1^2 + 3^2} = 3.74$}}
-\only<4-4>{\centering{$||x||_\infty = 3$}}
-\ei
+        \only<2-2>{\centering{$||x||_1 = 2 + 1 +3 = 6$}}
+        \only<3-3>{\centering{$||x||_2 = \sqrt{2^2 + 1^2 + 3^2} = 3.74$}}
+        \only<4-4>{\centering{$||x||_\infty = 3$}}
+    \ei
 \end{frame}
 
 
 %MATRIX NORMS
 \begin{frame}{Matrix Norms}
-\bi
-
-\item Matrix norm associated with vector norm $||\cdot||_k$ is
-\begin{align*}
-    ||A||_k = \sup\left\{||Au||_k : u\in\mathbb{R}^n , ||u||_k = 1\right\},
-\end{align*}
-
-where $A$ is an $n\times n$ matrix.
-\pause
-
-\item Note matrix norm is \emph{subordinate} to a chosen vector norm.
-\pause
-
-\item Two common subordinate matrix norms
-\pause
+    \begin{definition}
+        A matrix norm subordinate to a vector norm $\norm{\cdot}$ is defined as
+        \begin{align*}
+            \norm{A} = \sup\left\{\norm{Au} : u\in\mathbb{R}^n , \norm{u} = 1\right\},
+        \end{align*}
+        where $A$ is an $n\times n$ matrix.
+    \end{definition}
+    \pause
     \bi
-        \item Subordinate to vector norm $||\cdot||_\infty$ is
-        \begin{align*}
-            ||A||_\infty = \smash{\displaystyle\max_{1 \leq i \leq n}} \sum\limits_{j=1}^n |a_{ij}|,
-        \end{align*}
-        which is the maximum absolute row sum of $A$.
+        \item Two common subordinate matrix norms
         \pause
+        \bi
+            \item Subordinate to vector norm $\norm{\cdot}_\infty$ is
+            \begin{align*}
+                \norm{A}_\infty = \smash{\displaystyle\max_{1 \leq i \leq n}} \sum\limits_{j=1}^n \abs{a_{ij}},
+            \end{align*}
+            which is the maximum absolute row sum of $A$.
+            \pause
 
-        \item Subordinate to vector norm $||\cdot||_2$ is
-        \begin{align*}
-            ||A||_2 &= \sup\limits_{||x||_2=1} ||Ax||_2\\
-            &= \sqrt{\rho(A^TA)},
-        \end{align*}
-        where $\rho(A^TA)$ is spectral radius of $A^TA$, largest eigenvalue of $A^TA$.
+            \item Subordinate to vector norm $\norm{\cdot}_2$ is
+            \begin{align*}
+                \norm{A}_2 &= \sup\limits_{\norm{x}_2=1} \left\{\norm{Ax}_2\right\}\\
+                &= \sqrt{\rho(A^TA)},
+            \end{align*}
+            where $\rho(A^TA)$ is spectral radius of $A^TA$, largest eigenvalue of $A^TA$.
+        \ei
     \ei
-\ei
 \end{frame}
 
 
 %||A||_\infty EXAMPLE
 \begin{frame}{Examples of Matrix Norms}
-\bi
-
-\item Consider matrix
-$A = \begin{bmatrix}
-    1 & 1 \\
-    2 & 1\\
-\end{bmatrix}$
-
-\pause
-
-\item$(A^TA) = \begin{bmatrix} 5 & 3 \\ 3 & 2 \end{bmatrix}$\pause
-
-\item For $A^TA$, eigenvalues are $\sigma^2_1 = 6.8541$ and $\sigma^2_2 = 0.1459$.
-\pause
-\item So, $||A||_2 = \sqrt{6.8541} \approx 2.618$.
-\ei
+    \bi
+        \item Consider matrix
+        $A = \begin{bmatrix}
+            1 & 1 \\
+            2 & 1\\
+        \end{bmatrix}$
+        \pause
+        \item$(A^TA) = \begin{bmatrix} 5 & 3 \\ 3 & 2 \end{bmatrix}$
+        \pause
+        \item For $A^TA$, eigenvalues are $\sigma^2_1 = 6.8541$ and $\sigma^2_2 = 0.1459$.
+        \pause
+        \item So, $\norm{A}_2 = \sqrt{6.8541} \approx 2.618$.
+    \ei
 \end{frame}
+
 
 %||A||_2 EXAMPLE
 \begin{frame}{Examples of Matrix Norms}
-\bi
-
-\item Consider matrix
-$B = \begin{bmatrix}
-    3 & 2 & 4 \\
-    2 & 0 & 2 \\
-    4 & 2 & 3 \\
-\end{bmatrix}$
-
-\pause
-
-\item $||B||_2$ is simply the maximum absolute row sum, which is 9.
-
-\ei
+    \bi
+        \item Consider matrix
+        $B = \begin{bmatrix}
+            3 & 2 & 4 \\
+            2 & 0 & 2 \\
+            4 & 2 & 3 \\
+        \end{bmatrix}$
+        \pause
+        \item $\norm{B}_2$ is simply the maximum absolute row sum, which is 9.
+    \ei
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
