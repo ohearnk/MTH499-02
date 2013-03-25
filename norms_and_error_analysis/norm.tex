@@ -330,7 +330,11 @@
 
 
 \begin{frame}{Error and Conditino Number Example}
-    Consider
+    Consider $Ax = b$ perturbed to $A\tilde{x} = \tilde{b}$ where 
+    $$A = \begin{bmatrix} 1000 & 999\\999 & 998\end{bmatrix}, \quad b = \begin{bmatrix} 1999\\1997\end{bmatrix} \quad A^{-1} = \begin{bmatrix} -998 & 999\\999 & -1000\end{bmatrix} \quad \tilde{b}=\begin{bmatrix} 1998.99\\1997.01\end{bmatrix}$$
+    $$\norm{A}_\infty = \norm{A^{-1}}_\infty = 1999, \quad \mathcal{K}(A) \approx 3.996 \times 10^6$$
+    \pause
+    Compute $$\frac{\norm{x-\tilde{x}}_\infty}{\norm{x}_\infty} \le \mathcal{K}(A)\frac{\norm{b-\tilde{b}}_\infty}{\norm{b}_\infty}$$
 \end{frame}
 
 \end{document}
