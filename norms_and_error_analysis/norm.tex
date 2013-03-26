@@ -216,14 +216,14 @@
     \end{definition}
     \pause
     \bi
-        \item Two common matrix norms
+        \item Two common matrix norms:
         \pause
         \bi
             \item Subordinate to vector norm $\norm{\cdot}_\infty$ is
             \begin{align*}
                 \norm{A}_\infty = \smash{\displaystyle\max_{1 \leq i \leq n}} \sum\limits_{j=1}^n \abs{a_{ij}},
             \end{align*}
-            which is the maximum absolute row sum of $A$.
+            which is the maximum absolute row sum of $A$
             \pause
 
             \item Subordinate to vector norm $\norm{\cdot}_2$ is
@@ -231,7 +231,7 @@
                 \norm{A}_2 &= \sup\limits_{\norm{x}_2=1} \left\{\norm{Ax}_2\right\}\\
                 &= \sqrt{\rho(A^TA)},
             \end{align*}
-            where $\rho(A^TA)$ is spectral radius of $A^TA$, largest eigenvalue of $A^TA$.
+            where $\rho(A^TA)$ is spectral radius of $A^TA$ (i.e., largest eigenvalue in absolute value of $A^TA$)
         \ei
     \ei
 \end{frame}
@@ -265,7 +265,7 @@
             4 & 2 & 3 \\
         \end{bmatrix}$
         \pause
-        \item $\norm{B}_2$ is simply the maximum absolute row sum, which is 9.
+        \item $\norm{B}_\infty$ is simply the maximum absolute row sum, which is 9.
     \ei
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -295,10 +295,10 @@
     \pause
     \begin{block}{Results}
         \bi
-            \item Let $Ax = b$ be a linear system and let $B$ be a perturbation of
+            \item Let $Ax = b$ be a linear system with $A$ an $n \times n$ invertible matrix, and let $B$ be a perturbation of
             $A$ such that $B\tilde{x} = b$. Then the following holds: $$\frac{\norm{x-\tilde{x}}}{\norm{x}} \le \norm{I-BA}$$ \pause
             \vspace{-5mm}
-            \item Let $Ax = b$ be a linear system and let $\tilde{b}$ be a perturbation of
+            \item Let $Ax = b$ be a linear system with $A$ an $n \times n$ invertible matrix, and let $\tilde{b}$ be a perturbation of
             $b$ such that $A\tilde{x} = \tilde{b}$. Then the following holds: $$\norm{x-\tilde{x}} \le \norm{A^{-1}}\,\norm{b-\tilde{b}}$$ \pause
             \vspace{-5mm}
             \item Putting these together, we get 
