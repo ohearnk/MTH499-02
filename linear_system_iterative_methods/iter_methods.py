@@ -8,20 +8,38 @@ def gauss_seidel(A,b,x0,M,eps):
     if A.shape[0] != A.shape[1]:
         raise InvalidDimensionError
 
-    x_old = x0
-    x_new = np.zeros(b.shape, dtype=float)
+    x_old = np.copy(x0)
+    x_new = np.copy(x_old)
     k = 0
 
     while k < M:
         for i in xrange(A.shape[0]):
-            x_new[i] = (b[i] - np.sum(np.delete(A[i,:],i).dot(np.delete(x_old,i)))) / A[i,i]
+            # use the new values as soon as you're computed
+            x_new[i] = (b[i] - np.sum(np.delete(A[i,:],i).dot(np.delete(x_new,i)))) / A[i,i]
         print (k+1), fabs(la.norm(x_new-x_old))
-        #print x_old
-        #print x_new
         if fabs(la.norm(x_new-x_old)) < eps:
             break
         x_old = np.copy(x_new)
         k += 1
+
+
+def jacobi(A,b,x0,M,eps):
+    if A.shape[0] != A.shape[1]:
+        raise InvalidDimensionError
+
+    x_old = x0
+    x_new = np.zeros(b.shape, dtype=float)
+    k = 0
+    
+    while k < M:
+        for i in xrange(A.shape[0]):
+            x_new[i] = (b[i] - np.sum(np.delete(A[i,:],i).dot(np.delete(x_old,i)))) / A[i,i]
+        print (k+1), fabs(la.norm(x_new-x_old))
+        if fabs(la.norm(x_new-x_old)) < eps:
+            break
+        x_old = np.copy(x_new)
+        k += 1
+
 
 if __name__ == '__main__':
     # test code
@@ -33,6 +51,11 @@ if __name__ == '__main__':
     print 'b =', b
     print 'x_0 =', x0
     print
+    
+    print "Jacobi iterates:"
+    jacobi(A,b,x0,100,0.0001)
 
+    print
+    print "Gauss Seidel iterates:"
     gauss_seidel(A,b,x0,100,0.0001)
 
