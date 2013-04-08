@@ -156,6 +156,8 @@
 
 %THEOREM 1
 \begin{frame}{Theory On Iterative Methods for Solving Linear Systems Cont.}
+    \pause
+    Why This Iterative Process Works: \pause
     \bi
         \item Recall iterative process $Qx^{(k)} = (Q - A)x^{(k-1)} + b$ \pause
         \item Letting $k\rightarrow\infty$, solution is $Qx = (Q - A)x + b$ \pause
@@ -163,11 +165,13 @@
 	    \begin{align*}
 	        x^{(k)} = (I - Q^{-1}A)x^{(k-1)} + Q^{-1}b
 	    \end{align*}
+        \vspace{-3mm}
         \pause
         \item Taking limit of this gives solution
 	    \begin{align*}
 	        x = (I-Q^{-1}A)x+Q^{-1}b
 	    \end{align*}
+        \vspace{-3mm}
         \pause
 
 %\item Thus $x \mapsto (I - Q^{-1}A)x + Q^{-1}b$
@@ -177,6 +181,7 @@
 	    \begin{align*}
 	        ||x^{(k)} - x|| \leq || I -Q^{-1}A||^k~||x^{(0)}-x||
 	    \end{align*}
+        \vspace{-3mm}
         \pause
         \item Thus, if $|| I - Q^{-1}A|| < 1$, then $\lim\limits_{k\rightarrow\infty} ||x^{(k)} - x || = 0$ [[How does this follow from the last step?]]
     \ei
@@ -197,6 +202,25 @@
     \begin{corollary}
         The iteration formumla $$Qx^{(k)} = (Q-A)x^{(k-1)}+b$$ will produce a convergent sequence provided that $\rho(I-Q^{-1}A) < 1$.
     \end{corollary} 
+\end{frame}
+
+
+\begin{frame}{Iterative Methods}
+    \pause
+    \begin{centering}
+        \begin{tabular}{l|c|c}
+            Method & $Q$ & Iteration Formula: $x^{(k)} = (I-Q^{-1}A)x^{(k-1)}+Q^{-1}b$ \\ \hline \hline
+            Richardson & $I$ & $x^{(k)} = (I-A)x^{(k-1)}+b = x^{(k-1)}+r^{(k-1)}$ \\
+            Jacobi & $D$ & $x^{(k)} = (I-D^{-1}A)x^{(k-1)}+D^{-1}b$ \\
+            Gauss-Seidel & $L$ & $x^{(k)} = (I-L^{-1}A)x^{(k-1)}+L^{-1}b$
+        \end{tabular}
+    \end{centering}
+    \\[5mm]
+    where
+    \bi
+        \item $D$: diagonal matrix where $d_{ii} = a_{ii}$
+        \item $L$: lower triangular matrix where $l_{ij} = a_{ij}, i \ge j$
+    \ei
 \end{frame}
 
 \end{document}
