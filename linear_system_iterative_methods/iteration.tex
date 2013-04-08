@@ -1,0 +1,186 @@
+\documentclass[9pt, serif]{beamer}
+
+\newlength{\wideitemsep}
+\setlength{\wideitemsep}{\itemsep}
+%\addtolength{\wideitemsep}{9pt}
+\let\olditem\item
+\renewcommand{\item}{\setlength{\itemsep}{\wideitemsep}\olditem}
+
+% This file is a solution template for:
+
+% - Talk at a conference/colloquium.
+% - Talk length is about 20min.
+% - Style is ornate.
+
+\usepackage[noend]{algpseudocode}
+\usepackage{psfrag}
+\usepackage{graphics}
+\usepackage{marvosym}
+\usepackage{latexsym}
+\usepackage{amsfonts}
+\usepackage{amsmath}  
+\usepackage{bm}
+\usepackage{epstopdf}
+
+\newcommand{\bi}{\begin{itemize}}
+\newcommand{\be}{\begin{enumerate}}
+\newcommand{\ei}{\end{itemize}}
+\newcommand{\ee}{\end{enumerate}}
+\newcommand*\Let[2]{\State #1 $\gets$ #2}
+\newcommand{\abs}[1]{\lvert#1\rvert}
+\newcommand{\norm}[1]{\lVert#1\rVert}
+
+\definecolor{royalblue}{rgb}{.2,.6,1}%
+\definecolor{mygrey}{rgb}{.64,.64,.64}%
+\definecolor{mywhite}{rgb}{1,1,1}%
+\definecolor{mypurple}{rgb}{.8,.6,1}%
+
+\definecolor{red}{rgb}{1,0,0}
+\definecolor{skyblue}{rgb}{0.1960, 0.6000, 0.8000}
+
+
+\mode<presentation>
+{
+% THEME CHOICES
+%\usetheme{CambridgeUS}
+\usetheme{Warsaw}
+%\usetheme{Rochester}
+%\usetheme{Bergen}
+%\usetheme{Berlin}
+%\usetheme{Copenhagen}
+%\usetheme{Boadilla}
+%\usetheme{PaloAlto}
+
+% SET BACKGROUND COLORS
+
+\setbeamercolor{background canvas}{bg=white}
+\setbeamerfont{frametitle}{size=\large}
+}
+
+\setbeamercolor{frame}{bg=mygold}
+
+\usepackage[english]{babel}
+
+\usepackage[latin1]{inputenc}
+
+\usepackage{helvet}
+\usepackage[T1]{fontenc}
+
+\title[Iterative Methods for Solving Linear Systems]
+{Are We There Yet?\\Iterative Methods for Solving Linear Systems}
+\author[]
+{Nate DeMaagd, Kurt O'Hearn}
+\institute[Grand Valley State University]
+{MTH 499-02}
+\date{April 8, 2013}
+
+
+% If you have a file called "university-logo-filename.xxx", where xxx
+% is a graphic format that can be processed by latex or pdflatex,
+% resp., then you can add a logo as follows:
+
+%\pgfdeclareimage[height=1cm, width=1cm]{GVlogo}{GVSULOGOBLACK}
+% \logo{\pgfuseimage{GVlogo}}
+
+
+\begin{document}
+
+\begin{frame}
+    \titlepage
+\end{frame}
+
+
+\begin{frame}{Outline}
+    \pause
+    \bi
+        \item Overview of methods of solution: direct, indirect \pause
+        \item Theory on iterative methods for solving linear systems \pause
+        \item Description and examples of Richardson, Jacobi, and Gauss-Seidel methods
+    \ei
+\end{frame}
+
+
+%INTRODUCTION
+\begin{frame}{Overview of Direct and Indirect Methods of Solution}
+    \pause
+    \bi
+        \item Direct methods \pause
+        \bi
+            \item Execute a predetermined number of computations to produce a result \pause
+            \item Example: Gaussian elimination with scaled partial pivoting \pause
+    	    \bi
+	            \item Solves $Ax=b$ in a finite number of steps \pause
+        	    \item Gives exact answer (within roundoff errors) \pause
+    	    \ei
+        \ei
+        \item Indirect methods \pause
+        \bi
+            \item Generate a sequence of intermediate results which (hopefully) produce the desired final result \pause
+	        \item Typically yield approximate solutions within some tolerance ($\epsilon$) or after a prescribed number of iterations \pause
+	        \item Almost always are iterative in nature \pause
+	        \item Example: finding solutions to linear systems (today's topic!)
+	    \ei
+    \ei
+\end{frame}
+
+
+%BASIC CONCEPTS
+\begin{frame}{Theory On Iterative Methods Solving Linear Systems}
+    \pause
+    Developing A Simple Iterative Method \pause
+    \bi
+        \item Want to solve: $Ax=b$ for $x$ with $A \in \mathbb{R}^{n \times n}$, $A$ invertible \pause
+        \item Introduce an invertible ``splitting matrix'' $Q$ and rearrange to get
+	    \begin{align*}
+		    Qx = (Q - A)x + b
+	    \end{align*} \pause
+        \vspace{-5mm}
+        \item Now define our iterative process as
+	    \begin{align*}
+		    Qx^{(k)} = (Q - A)x^{(k-1)} + b
+	    \end{align*}
+        where $k > 1$ denotes the $k^{\text{th}}$ step in the process \pause
+        \bi
+            \item Want: each successive iteration to produce a better approximation for $x$ (i.e., converge) \pause
+	        \item Also want: algorithms which guarantee convergence after satisfying some conditions \pause
+            \item To achieve these ends, we seek $Q$ such that:
+            \bi
+                \item $\norm{x-x^{(k)}} \to 0$ rapidly, and
+                \item $\left[x^{(k)}\right]$ is easy to compute
+            \ei \pause
+            \item Note: often the initial vector $x^{(0)}$ is an estimate of the solution or arbitrary ($x = 0$)
+        \ei
+    \ei
+\end{frame}
+
+
+%THEOREM 1
+\begin{frame}{Theory On Iterative Methods Solving Linear Systems Cont.}
+    \bi
+        \item Recall iterative process $Qx^{(k)} = (Q - A)x^{(k-1)} + b$ \pause
+        \item Letting $k\rightarrow\infty$, solution is $Qx = (Q - A)x + b$ \pause
+        \item Assume $Q$ and $A$ nonsingular. So, $Q^{-1}$ and $A^{-1}$ exist and
+	    \begin{align*}
+	        x^{(k)} = (I - Q^{-1}A)x^{(k-1)} + Q^{-1}b
+	    \end{align*}
+        \pause
+        \item Taking limit of this gives solution
+	    \begin{align*}
+	        x = (I-Q^{-1}A)x+Q^{-1}b
+	    \end{align*}
+        \pause
+
+%\item Thus $x \mapsto (I - Q^{-1}A)x + Q^{-1}b$
+
+        \item Thus $x^{(k)} - x = (I-Q^{-1}A)(x^{(k-1)}-x)$ \pause
+        \item Select vector norm and subordinate norm so that by repeated [[repeated what?]]
+	    \begin{align*}
+	        ||x^{(k)} - x|| \leq || I -Q^{-1}A||^k~||x^{(0)}-x||
+	    \end{align*}
+        \pause
+        \item Thus, if $|| I - Q^{-1}A|| < 1$, then $\lim\limits_{k\rightarrow\infty} ||x^{(k)} - x || = 0$ [[How does this follow from the last step?]]
+    \ei
+\end{frame}
+
+
+\end{document}
