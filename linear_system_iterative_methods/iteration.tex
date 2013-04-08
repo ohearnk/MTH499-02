@@ -125,7 +125,7 @@
 
 
 %BASIC CONCEPTS
-\begin{frame}{Theory On Iterative Methods Solving Linear Systems}
+\begin{frame}{Theory On Iterative Methods for Solving Linear Systems}
     \pause
     Developing A Simple Iterative Method \pause
     \bi
@@ -155,7 +155,7 @@
 
 
 %THEOREM 1
-\begin{frame}{Theory On Iterative Methods Solving Linear Systems Cont.}
+\begin{frame}{Theory On Iterative Methods for Solving Linear Systems Cont.}
     \bi
         \item Recall iterative process $Qx^{(k)} = (Q - A)x^{(k-1)} + b$ \pause
         \item Letting $k\rightarrow\infty$, solution is $Qx = (Q - A)x + b$ \pause
@@ -182,5 +182,21 @@
     \ei
 \end{frame}
 
+
+\begin{frame}{Theory on Iterative Methods for Solving Linear Systems Cont.}
+    More General Conditions for Iterative Method Convergence \pause
+    \begin{theorem}
+        The spectral radius of a matrix $A$, $\rho(A) = \max_{1\le i\le n}\abs{\lambda_i}$, satisfies $$\rho(A) = \inf_{\norm{\cdot}}\norm{A}.$$
+    \end{theorem} 
+    \pause
+    \begin{theorem}
+        For the linear system $Ax = b$ with $A$ invertible, define the iteration formula $$x^{(k)} = Gx^{(k-1)} + c.$$
+        The sequence $\left[x^{(k)}\right]$ will converge to $(I - G)^{-1}c$ provided that $\rho(G) < 1$.
+    \end{theorem}
+    \pause
+    \begin{corollary}
+        The iteration formumla $$Qx^{(k)} = (Q-A)x^{(k-1)}+b$$ will produce a convergent sequence provided that $\rho(I-Q^{-1}A) < 1$.
+    \end{corollary} 
+\end{frame}
 
 \end{document}
