@@ -1,0 +1,205 @@
+\documentclass[9pt, serif]{beamer}
+
+\newlength{\wideitemsep}
+\setlength{\wideitemsep}{\itemsep}
+%\addtolength{\wideitemsep}{9pt}
+\let\olditem\item
+\renewcommand{\item}{\setlength{\itemsep}{\wideitemsep}\olditem}
+
+% This file is a solution template for:
+
+% - Talk at a conference/colloquium.
+% - Talk length is about 20min.
+% - Style is ornate.
+
+\usepackage[noend]{algpseudocode}
+\usepackage{graphics}
+\usepackage{marvosym}
+\usepackage{latexsym}
+\usepackage{amsfonts}
+\usepackage{amsmath}  
+\usepackage{epstopdf}
+\usepackage[english]{babel}
+\usepackage[latin1]{inputenc}
+\usepackage{helvet}
+\usepackage[T1]{fontenc}
+
+
+\newcommand{\bi}{\begin{itemize}}
+\newcommand{\be}{\begin{enumerate}}
+\newcommand{\ei}{\end{itemize}}
+\newcommand{\ee}{\end{enumerate}}
+\newcommand*\Let[2]{\State #1 $\gets$ #2}
+\newcommand{\abs}[1]{\lvert#1\rvert}
+\newcommand{\norm}[1]{\lVert#1\rVert}
+
+
+\mode<presentation>
+{
+% THEME CHOICES
+%\usetheme{CambridgeUS}
+\usetheme{Warsaw}
+%\usetheme{Rochester}
+%\usetheme{Bergen}
+%\usetheme{Berlin}
+%\usetheme{Copenhagen}
+%\usetheme{Boadilla}
+%\usetheme{PaloAlto}
+
+% SET BACKGROUND COLORS
+\setbeamercolor{background canvas}{bg=white}
+\setbeamerfont{frametitle}{size=\large}
+}
+\setbeamercolor{frame}{bg=mygold}
+
+
+\title[Methods of Solution for Linear Systems]
+{A Summary of Methods of Solution for Linear Systems}
+\author[]
+{Nate DeMaagd, Kurt O'Hearn}
+\institute[Grand Valley State University]
+{MTH 499-02}
+\date{April 23, 2013}
+
+
+\begin{document}
+
+\begin{frame}
+    \titlepage
+\end{frame}
+
+
+\begin{frame}{Outline}
+    \pause
+    \bi
+        \item Overview of methods of solution: direct, indirect \pause
+        \item Theory on iterative methods for solving linear systems \pause
+        \item Description and examples of Richardson, Jacobi, and Gauss-Seidel methods
+    \ei
+\end{frame}
+
+
+%INTRODUCTION
+\begin{frame}{Overview of Direct and Indirect Methods of Solution}
+    \pause
+    \bi
+        \item Direct methods \pause
+        \bi
+            \item Execute a predetermined number of computations to produce a result \pause
+            \item Example: Gaussian elimination with scaled partial pivoting \pause
+    	    \bi
+	            \item Solves $Ax=b$ in a finite number of steps \pause
+        	    \item Gives exact answer (within roundoff errors) \pause
+    	    \ei
+        \ei
+        \item Indirect methods \pause
+        \bi
+            \item Generate a sequence of intermediate results which (hopefully) produce the desired final result \pause
+	        \item Typically yield approximate solutions within some tolerance ($\epsilon$) or after a prescribed number of iterations \pause
+	        \item Almost always are iterative in nature \pause
+	        \item Example: finding solutions to linear systems (today's topic!)
+	    \ei
+    \ei
+\end{frame}
+
+
+%BASIC CONCEPTS
+\begin{frame}{Theory On Iterative Methods for Solving Linear Systems}
+    \pause
+    Developing A Simple Iterative Method \pause
+    \bi
+        \item Want to solve: $Ax=b$ for $x$ with $A \in \mathbb{R}^{n \times n}$, $A$ invertible \pause
+        \item Introduce an invertible ``splitting matrix'' $Q$ and rearrange to get
+	    \begin{align*}
+		    Qx = (Q - A)x + b
+	    \end{align*} \pause
+        \vspace{-5mm}
+        \item Now define our iterative process as
+	    \begin{align*}
+		    Qx^{(k)} = (Q - A)x^{(k-1)} + b
+	    \end{align*}
+        where $k > 1$ denotes the $k^{\text{th}}$ step in the process \pause
+        \bi
+            \item Want: each successive iteration to produce a better approximation for $x$ (i.e., converge) \pause
+	        \item Also want: algorithms which guarantee convergence after satisfying some conditions \pause
+            \item To achieve these ends, we seek $Q$ such that:
+            \bi
+                \item $\norm{x-x^{(k)}} \to 0$ rapidly, and
+                \item $\left[x^{(k)}\right]$ is easy to compute
+            \ei \pause
+            \item Note: often the initial vector $x^{(0)}$ is an estimate of the solution or arbitrary ($x = 0$)
+        \ei
+    \ei
+\end{frame}
+
+
+%THEOREM 1
+\begin{frame}{Theory On Iterative Methods for Solving Linear Systems Cont.}
+    \pause
+    Why This Iterative Process Works: \pause
+    \bi
+        \item Recall iterative process $Qx^{(k)} = (Q - A)x^{(k-1)} + b$ \pause
+        \item Letting $k\rightarrow\infty$, solution is $Qx = (Q - A)x + b$ \pause
+        \item Assume $Q$ and $A$ nonsingular. So, $Q^{-1}$ and $A^{-1}$ exist and
+	    \begin{align*}
+	        x^{(k)} = (I - Q^{-1}A)x^{(k-1)} + Q^{-1}b
+	    \end{align*}
+        \vspace{-3mm}
+        \pause
+        \item Taking limit of this gives solution
+	    \begin{align*}
+	        x = (I-Q^{-1}A)x+Q^{-1}b
+	    \end{align*}
+        \vspace{-3mm}
+        \pause
+
+%\item Thus $x \mapsto (I - Q^{-1}A)x + Q^{-1}b$
+
+        \item Thus $x^{(k)} - x = (I-Q^{-1}A)(x^{(k-1)}-x)$ \pause
+        \item Select vector norm and subordinate norm so that by using the norm and the recursive definition
+	    \begin{align*}
+	        ||x^{(k)} - x|| \leq || I -Q^{-1}A||^k~||x^{(0)}-x||
+	    \end{align*}
+        \vspace{-3mm}
+        \pause
+        \item Thus, if $|| I - Q^{-1}A|| < 1$, then $\lim\limits_{k\rightarrow\infty} ||x^{(k)} - x || = 0$ 
+    \ei
+\end{frame}
+
+
+\begin{frame}{Theory on Iterative Methods for Solving Linear Systems Cont.}
+    More General Conditions for Iterative Method Convergence \pause
+    \begin{theorem}
+        The spectral radius of a matrix $A$, $\rho(A) = \max_{1\le i\le n}\abs{\lambda_i}$, satisfies $$\rho(A) = \inf_{\norm{\cdot}}\norm{A}.$$
+    \end{theorem} 
+    \pause
+    \begin{theorem}
+        For the linear system $Ax = b$ with $A$ invertible, define the iteration formula $$x^{(k)} = Gx^{(k-1)} + c.$$
+        The sequence $\left[x^{(k)}\right]$ will converge to $(I - G)^{-1}c$ provided that $\rho(G) < 1$.
+    \end{theorem}
+    \pause
+    \begin{corollary}
+        The iteration formumla $$Qx^{(k)} = (Q-A)x^{(k-1)}+b$$ will produce a convergent sequence provided that $\rho(I-Q^{-1}A) < 1$.
+    \end{corollary} 
+\end{frame}
+
+
+\begin{frame}{Iterative Methods}
+    \pause
+    \begin{centering}
+        \begin{tabular}{l|c|c}
+            Method & $Q$ & Iteration Formula: $x^{(k)} = (I-Q^{-1}A)x^{(k-1)}+Q^{-1}b$ \\ \hline \hline
+            Richardson & $I$ & $x^{(k)} = (I-A)x^{(k-1)}+b = x^{(k-1)}+r^{(k-1)}$ \\
+            Jacobi & $D$ & $x^{(k)} = (I-D^{-1}A)x^{(k-1)}+D^{-1}b$ \\
+            Gauss-Seidel & $L$ & $x^{(k)} = (I-L^{-1}A)x^{(k-1)}+L^{-1}b$
+        \end{tabular}
+    \end{centering}
+    \\[5mm]
+    where
+    \bi
+        \item $D$: diagonal matrix where $d_{ii} = a_{ii}$
+        \item $L$: lower triangular matrix where $l_{ij} = a_{ij}, i \ge j$
+    \ei
+\end{frame}
+
+\end{document}
