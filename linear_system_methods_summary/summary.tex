@@ -72,34 +72,45 @@
 \begin{frame}{Outline}
     \pause
     \bi
-        \item Overview of methods of solution: direct, indirect \pause
-        \item Theory on iterative methods for solving linear systems \pause
-        \item Description and examples of Richardson, Jacobi, and Gauss-Seidel methods
+        \item Types of methods \pause
+        \item Direct methods and examples \pause
+        \item Indirect methods and examples
     \ei
 \end{frame}
 
 
 %INTRODUCTION
-\begin{frame}{Overview of Direct and Indirect Methods of Solution}
+\begin{frame}{Overview of Types of Methods for Solving Linear Systems}
     \pause
+    Recall: For the linear system $Ax = b$ with $A_{m\times n}$: \\
+    \pause
+    \begin{center}
+        \begin{tabular}{l|l}
+            System Type & Possible Number of Solutions \\ \hline
+            Square ($m = n$) & None, Unique \\
+            Overdetermined ($m > n$) & None, Unique \\
+            Underdetermined ($m < n$) & None, Infinite \\
+        \end{tabular}
+    \end{center}
+    \pause
+    Types of Methods
     \bi
         \item Direct methods \pause
         \bi
             \item Execute a predetermined number of computations to produce a result \pause
-            \item Example: Gaussian elimination with scaled partial pivoting \pause
-    	    \bi
-	            \item Solves $Ax=b$ in a finite number of steps \pause
-        	    \item Gives exact answer (within roundoff errors) \pause
-    	    \ei
+            \item Methods: compute $A^{-1}$, transform $A$ using factorizations/pivoting \pause
         \ei
         \item Indirect methods \pause
         \bi
             \item Generate a sequence of intermediate results which (hopefully) produce the desired final result \pause
-	        \item Typically yield approximate solutions within some tolerance ($\epsilon$) or after a prescribed number of iterations \pause
-	        \item Almost always are iterative in nature \pause
-	        \item Example: finding solutions to linear systems (today's topic!)
-	    \ei
+	        \item Methods: \pause
+            \bi
+                \item General: Richardson, Jacobi, Gauss-Seidel, SOR \pause
+                \item Symmetric, positive definite: steepest descent, conjugate gradient \pause
+            \ei
+    	\ei
     \ei
+    Note: methods can be general or exploit certain matrix characteristics
 \end{frame}
 
 
@@ -186,15 +197,15 @@
 
 \begin{frame}{Iterative Methods}
     \pause
-    \begin{centering}
+    \begin{center}
         \begin{tabular}{l|c|c}
             Method & $Q$ & Iteration Formula: $x^{(k)} = (I-Q^{-1}A)x^{(k-1)}+Q^{-1}b$ \\ \hline \hline
             Richardson & $I$ & $x^{(k)} = (I-A)x^{(k-1)}+b = x^{(k-1)}+r^{(k-1)}$ \\
             Jacobi & $D$ & $x^{(k)} = (I-D^{-1}A)x^{(k-1)}+D^{-1}b$ \\
             Gauss-Seidel & $L$ & $x^{(k)} = (I-L^{-1}A)x^{(k-1)}+L^{-1}b$
         \end{tabular}
-    \end{centering}
-    \\[5mm]
+        \\[5mm]
+    \end{center} 
     where
     \bi
         \item $D$: diagonal matrix where $d_{ii} = a_{ii}$
