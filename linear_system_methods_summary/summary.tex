@@ -23,6 +23,7 @@
 \usepackage[latin1]{inputenc}
 \usepackage{helvet}
 \usepackage[T1]{fontenc}
+\usepackage{hyperref}
 
 
 \newcommand{\bi}{\begin{itemize}}
@@ -104,8 +105,7 @@
             \item Generate a sequence of intermediate results which (hopefully) produce the desired final result \pause
 	        \item Methods: \pause
             \bi
-                \item General: Richardson, Jacobi, Gauss-Seidel, SOR \pause
-                \item Symmetric, positive definite: steepest descent, conjugate gradient \pause
+                \item Richardson, Jacobi, Gauss-Seidel, SOR, steepest descent, conjugate gradient \pause
             \ei
     	\ei
     \ei
@@ -356,6 +356,11 @@
     \bi
         \item $D = a_{ii}, C = -a_{ij} \ni i \ge j$
     \ei
+\end{frame}
+
+
+\begin{frame}{Indirect Methods: SOR Example}
+    \href{http://www.youtube.com/watch?v=Mnrxljo1lOM}{SOR Example}
 \end{frame}
 
 
