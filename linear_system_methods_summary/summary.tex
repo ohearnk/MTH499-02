@@ -234,20 +234,14 @@
         The sequence $\left\{x^{(k)}\right\}$ will converge to $(I - G)^{-1}c$ provided that $\rho(G) < 1$.
     \end{theorem}
     \pause
-    \begin{center}
-        \begin{tabular}{l|c}
-            Method & Iteration Formula: $x^{(k)} = (I-Q^{-1}A)x^{(k-1)}+Q^{-1}b$ \\ \hline \hline
-            Richardson & $x^{(k)} = (I-A)x^{(k-1)}+b = x^{(k-1)}+r^{(k-1)}$ \\
-            Jacobi & $x^{(k)} = (I-D^{-1}A)x^{(k-1)}+D^{-1}b$ \\
-            Gauss-Seidel & $x^{(k)} = (I-L^{-1}A)x^{(k-1)}+L^{-1}b$ \\
-            SOR & $x^{(k)} = (I-(\alpha D-C)^{-1}A)x^{(k-1)}+(\alpha D-C)^{-1}b$
-        \end{tabular}
-    \end{center} 
-    where
+    Methods
     \bi
-        \item $D$: diagonal matrix where $d_{ii} = a_{ii}$
-        \item $L$: lower triangular matrix where $l_{ij} = a_{ij}, i \ge j$
-        \item $C$: $C + C^* = D - A$, $C^*$ Hermitian, $\alpha \in \mathbb{R} \ni \alpha > \frac{1}{2}$
+        \item Richardson
+        \item Jacobi
+        \item Gauss-Seidel
+        \item SOR
+        \item Steepest Descent
+        \item Conjugate Gradient
     \ei
 \end{frame}
 
