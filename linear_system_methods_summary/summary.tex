@@ -33,7 +33,6 @@
 \newcommand{\abs}[1]{\lvert#1\rvert}
 \newcommand{\norm}[1]{\lVert#1\rVert}
 
-
 \mode<presentation>
 {
 % THEME CHOICES
@@ -114,103 +113,256 @@
 \end{frame}
 
 
-%BASIC CONCEPTS
-\begin{frame}{Theory On Iterative Methods for Solving Linear Systems}
+%GAUSSIAN ELIMINATION OVERVIEW
+\begin{frame}{Direct Methods}
     \pause
-    Developing A Simple Iterative Method \pause
+    Compute $A^{-1}$ \pause
     \bi
-        \item Want to solve: $Ax=b$ for $x$ with $A \in \mathbb{R}^{n \times n}$, $A$ invertible \pause
-        \item Introduce an invertible ``splitting matrix'' $Q$ and rearrange to get
-	    \begin{align*}
-		    Qx = (Q - A)x + b
-	    \end{align*} \pause
-        \vspace{-5mm}
-        \item Now define our iterative process as
-	    \begin{align*}
-		    Qx^{(k)} = (Q - A)x^{(k-1)} + b
-	    \end{align*}
-        where $k > 1$ denotes the $k^{\text{th}}$ step in the process \pause
+        \item Most likely too difficult but not always (e.g., diagonal) \pause
+    \ei
+    Gaussian Elimination \pause
+    \bi
+        \item Solve by reducing the coefficient matrix to triangular form using elementary row operations \pause
+        \item Result can then by easily solved using forward/backward substitution \pause
+        \item Possible row operations:
         \bi
-            \item Want: each successive iteration to produce a better approximation for $x$ (i.e., converge) \pause
-	        \item Also want: algorithms which guarantee convergence after satisfying some conditions \pause
-            \item To achieve these ends, we seek $Q$ such that:
+            \item Interchange
+            \item Scaling
+            \item Addition \pause
+        \ei 
+        \item Recall: GE is equivalent to computing $LU$ factorization
+    \ei
+\end{frame}
+
+
+%GAUSSIAN ELIMINATION: PIVOTING METHODS
+\begin{frame}{Direct Methods: Gaussian Elimination and Pivoting Methods}
+    Pivoting Methods \pause
+    \bi
+        \item Types of pivoting:
+        \bi
+            \item Partial/complete: pertains to the amount of the matrix examined to find where to pivot \pause
             \bi
-                \item $\norm{x-x^{(k)}} \to 0$ rapidly, and
-                \item $\left[x^{(k)}\right]$ is easy to compute
+                \item Partial: analyze one row
+                \item Complete: analyze entire submatrix
             \ei \pause
-            \item Note: often the initial vector $x^{(0)}$ is an estimate of the solution or arbitrary ($x = 0$)
+            \item Unscaled/scaled: pertains to how the potential pivot locations are compared \pause
+            \bi
+                \item Unscaled: compare absolute value of entries directly
+                \item Scaled: compare ratios of pivot entries to maximum entries in magnitude in each row
+            \ei
         \ei
     \ei
 \end{frame}
 
 
-%THEOREM 1
-\begin{frame}{Theory On Iterative Methods for Solving Linear Systems Cont.}
-    \pause
-    Why This Iterative Process Works: \pause
-    \bi
-        \item Recall iterative process $Qx^{(k)} = (Q - A)x^{(k-1)} + b$ \pause
-        \item Letting $k\rightarrow\infty$, solution is $Qx = (Q - A)x + b$ \pause
-        \item Assume $Q$ and $A$ nonsingular. So, $Q^{-1}$ and $A^{-1}$ exist and
-	    \begin{align*}
-	        x^{(k)} = (I - Q^{-1}A)x^{(k-1)} + Q^{-1}b
-	    \end{align*}
-        \vspace{-3mm}
-        \pause
-        \item Taking limit of this gives solution
-	    \begin{align*}
-	        x = (I-Q^{-1}A)x+Q^{-1}b
-	    \end{align*}
-        \vspace{-3mm}
-        \pause
+%PIVOTING EXAMPLE WITH PERMUTATION MATRIX
+\begin{frame}{Direct Methods: Pivoting Examples}
+    \begin{columns}
+    \column{.35\textwidth}
+        \only<1-2>{
+            $A_1=\begin{bmatrix}
+            1 & 3 & 6 \\
+            2 & 1 & 1 \\
+            1 & 3 & 3
+            \end{bmatrix}$
+        }
+        \only<3-5>{
+            $A_2=\begin{bmatrix}
+            0 & 2.5 & 5.5 \\
+            1 & 0.5 & 0.5 \\
+            0 & 2.5 & 2.5
+            \end{bmatrix}$
+        }
+        \only<6-7>{
+            $A_3=\begin{bmatrix}
+            0 & 1 & 2.2 \\
+            1 & 0.5 & $-0.6$ \\
+            0 & 0 & $-3$
+            \end{bmatrix}$
+        }
+        \only<8-8>{
+            $A_4=\begin{bmatrix}
+            0 & 1 & 2.2 \\
+            1 & 0.5 & $-0.6$ \\
+            0 & 0 & 1
+            \end{bmatrix}$
+        }
+        \vspace{5mm}
+        \only<1-1>{
+            $p = \begin{bmatrix}1,&2,&3\end{bmatrix}$
+        }
+        \only<2-8>{
+            $p = \begin{bmatrix}2,&1,&3\end{bmatrix}$
+        }
 
-%\item Thus $x \mapsto (I - Q^{-1}A)x + Q^{-1}b$
+    \column{.65\textwidth}
+        \begin{algorithmic}[1]
+            \Function{GE\_PP}{$n, (a_{ij}), (p_{i})$}
+                \For{$k = 1 \textbf{ to } n-1$}
+                    \For{$i = k + 1 \textbf{ to } n$}
+                        \Let{$z$}{$a_{p_ik}/a_{p_kk}$}
+                        \Let{$a_{p_ik}$}{$0$}
+                        \For{$j = k + 1 \textbf{ to } n$}
+                            \Let{$a_{p_ij}$}{$a_{p_ij}-za_{p_kj}$}
+                        \EndFor
+                    \EndFor
+                \EndFor
+                \vspace{-5mm}
+                \State \Return{$(a_{ij})$}
+            \EndFunction
+        \end{algorithmic}
+    \end{columns}
+    \vspace{8mm}
 
-        \item Thus $x^{(k)} - x = (I-Q^{-1}A)(x^{(k-1)}-x)$ \pause
-        \item Select vector norm and subordinate norm so that by using the norm and the recursive definition
-	    \begin{align*}
-	        ||x^{(k)} - x|| \leq || I -Q^{-1}A||^k~||x^{(0)}-x||
-	    \end{align*}
-        \vspace{-3mm}
-        \pause
-        \item Thus, if $|| I - Q^{-1}A|| < 1$, then $\lim\limits_{k\rightarrow\infty} ||x^{(k)} - x || = 0$ 
-    \ei
-\end{frame}
-
-
-\begin{frame}{Theory on Iterative Methods for Solving Linear Systems Cont.}
-    More General Conditions for Iterative Method Convergence \pause
-    \begin{theorem}
-        The spectral radius of a matrix $A$, $\rho(A) = \max_{1\le i\le n}\abs{\lambda_i}$, satisfies $$\rho(A) = \inf_{\norm{\cdot}}\norm{A}.$$
-    \end{theorem} 
-    \pause
-    \begin{theorem}
-        For the linear system $Ax = b$ with $A$ invertible, define the iteration formula $$x^{(k)} = Gx^{(k-1)} + c.$$
-        The sequence $\left[x^{(k)}\right]$ will converge to $(I - G)^{-1}c$ provided that $\rho(G) < 1$.
-    \end{theorem}
-    \pause
-    \begin{corollary}
-        The iteration formumla $$Qx^{(k)} = (Q-A)x^{(k-1)}+b$$ will produce a convergent sequence provided that $\rho(I-Q^{-1}A) < 1$.
-    \end{corollary} 
+    \only<1-3>{$$\max(\abs{1},\abs{2},\abs{1}) = 2$$}
+    \only<2-3>{$$R_1 \leftarrow R_1 - \frac{1}{2}R_2$$}
+    \only<2-3>{$$R_3 \leftarrow R_3 - \frac{1}{2}R_2$$}
+    \only<2-3>{$$R_2 \leftarrow \frac{1}{2}R_2$$}
+    \only<4-6>{$$\max(\abs{2.5},\abs{2.5}) = 2.5$$}
+    \only<5-6>{$$R_3 \leftarrow R_3 - R_2$$}
+    \only<5-6>{$$R_1 \leftarrow \frac{2}{5}R_1$$}
+    \only<7-8>{$$R_3 \leftarrow -\frac{1}{3}R_3$$}
 \end{frame}
 
 
 \begin{frame}{Iterative Methods}
     \pause
+    Recall: General Conditions for Iterative Method Convergence \pause
+        \begin{theorem}
+        For the linear system $Ax = b$ with $A$ invertible, define the iteration formula $$x^{(k)} = Gx^{(k-1)} + c.$$
+        The sequence $\left\{x^{(k)}\right\}$ will converge to $(I - G)^{-1}c$ provided that $\rho(G) < 1$.
+    \end{theorem}
+    \pause
     \begin{center}
-        \begin{tabular}{l|c|c}
-            Method & $Q$ & Iteration Formula: $x^{(k)} = (I-Q^{-1}A)x^{(k-1)}+Q^{-1}b$ \\ \hline \hline
-            Richardson & $I$ & $x^{(k)} = (I-A)x^{(k-1)}+b = x^{(k-1)}+r^{(k-1)}$ \\
-            Jacobi & $D$ & $x^{(k)} = (I-D^{-1}A)x^{(k-1)}+D^{-1}b$ \\
-            Gauss-Seidel & $L$ & $x^{(k)} = (I-L^{-1}A)x^{(k-1)}+L^{-1}b$
+        \begin{tabular}{l|c}
+            Method & Iteration Formula: $x^{(k)} = (I-Q^{-1}A)x^{(k-1)}+Q^{-1}b$ \\ \hline \hline
+            Richardson & $x^{(k)} = (I-A)x^{(k-1)}+b = x^{(k-1)}+r^{(k-1)}$ \\
+            Jacobi & $x^{(k)} = (I-D^{-1}A)x^{(k-1)}+D^{-1}b$ \\
+            Gauss-Seidel & $x^{(k)} = (I-L^{-1}A)x^{(k-1)}+L^{-1}b$ \\
+            SOR & $x^{(k)} = (I-(\alpha D-C)^{-1}A)x^{(k-1)}+(\alpha D-C)^{-1}b$
         \end{tabular}
-        \\[5mm]
     \end{center} 
     where
     \bi
         \item $D$: diagonal matrix where $d_{ii} = a_{ii}$
         \item $L$: lower triangular matrix where $l_{ij} = a_{ij}, i \ge j$
+        \item $C$: $C + C^* = D - A$, $C^*$ Hermitian, $\alpha \in \mathbb{R} \ni \alpha > \frac{1}{2}$
     \ei
 \end{frame}
+
+
+\begin{frame}{Indirect Methods: Richardson}
+    Method
+    \bi
+        \item Richardson
+    \ei
+    System Stipulations
+    \bi
+        \item $A$ invertible
+    \ei
+    Iteration Formula
+    \bi
+        \item $x^{(k)} = (I-A)x^{(k-1)}+b = x^{(k-1)}+r^{(k-1)}$
+    \ei
+    Convergence Criteria
+    \bi
+        \item $\rho(I-A)<1$
+    \ei
+\end{frame}
+
+
+%EXAMPLES
+\begin{frame}{Indirect Methods: Richardson Method Example}
+\pause
+\bi
+\item Consider matrix $A=\begin{bmatrix}6&1&1\\2&4&0\\1&2&6\end{bmatrix}$ with solution $b=\begin{bmatrix}12\\0\\6\end{bmatrix}.$
+\pause
+\item Algorithm is $x^{(k+1)} = (I-\omega A)x^{(k)}+\omega b^{(k)}$ for some scalar $\omega\neq 0$ such that $|r|<1$.
+\pause
+\item Let $x^{(0)} = \begin{bmatrix}2&2&2\end{bmatrix}^T$ and $\omega = \dfrac{1}{6}$.
+\pause
+\item \begin{align*}
+	x^{(1)} &= \begin{bmatrix}0&-1/6&-1/6\\-1/3&1/3&0\\-1/6&-1/3&0\end{bmatrix}\begin{bmatrix}2\\2\\2\end{bmatrix}+\dfrac{1}{6}\begin{bmatrix}12\\0\\6\end{bmatrix}\\
+	\vspace{2cm}
+	& = \begin{bmatrix}4/3&0&0\end{bmatrix}^T
+\end{align*}
+\pause
+\item After 12 iterations, $x^{(12)}\approx \begin{bmatrix}2&-1&1\end{bmatrix}^T$.
+\ei
+\end{frame}
+
+
+\begin{frame}{Indirect Methods: Jacobi}
+    Method
+    \bi
+        \item Jacobi
+    \ei
+    System Stipulations
+    \bi
+        \item $A$ invertible
+        \item $A$ diagonally dominant
+    \ei
+    Iteration Formula
+    \bi
+        \item $x^{(k)} = (I-D^{-1}A)x^{(k-1)}+D^{-1}b$
+        \item $D = a_{ii}$
+    \ei
+    Convergence Criteria
+    \bi
+        \item $\rho(I-D^{-1}A)<1$
+    \ei
+\end{frame}
+
+
+\begin{frame}{Indirect Methods: Gauss-Seidel}
+    Method
+    \bi
+        \item Gauss-Seidel
+    \ei
+    System Stipulations
+    \bi
+        \item $A$ invertible
+        \item $A$ diagonally dominant
+    \ei
+    Iteration Formula
+    \bi
+        \item $x^{(k)} = (I-L^{-1}A)x^{(k-1)}+L^{-1}b$
+        \item $L = a_{ij}, i \ge j$ 
+    \ei
+    Convergence Criteria
+    \bi
+        \item $\rho(I-L^{-1}A)<1$
+    \ei
+\end{frame}
+
+
+\begin{frame}{Indirect Methods: Successive Overrelaxation}
+    Method
+    \bi
+        \item SOR
+    \ei
+    System Stipulations
+    \bi
+        \item Complex system
+        \item $A$: positive definite, Hermitian
+    \ei
+    Iteration Formula
+    \bi
+        \item $x^{(k+1)}=(I-(\alpha D-C)^{-1}A)x^{(k)}+(\alpha D-C)^{(-1)}b$
+        \item $D$: positive definite, Hermitian
+        \item $C: C+C^*=D-A$
+        \item $\alpha\in\mathbb{R} \ni \alpha>\frac{1}{2}$
+    \ei
+    Convergence Criteria
+    \bi
+        \item $\rho(I-(\alpha D-C)^{-1}A)<1$
+    \ei
+    Typical values
+    \bi
+        \item $D = a_{ii}, C = -a_{ij} \ni i \ge j$
+    \ei
+\end{frame}
+
 
 \end{document}
