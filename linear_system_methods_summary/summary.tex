@@ -359,4 +359,44 @@
 \end{frame}
 
 
+\begin{frame}{Indirect Methods: Steepest Descent}
+    Method
+    \bi
+        \item Steepest Descent
+    \ei
+    System Stipulations
+    \bi
+        \item $A$ invertible
+        \item $A$ symmetric, positive definite
+    \ei
+    Iteration Formula
+    \bi
+        \item $x^{(k)} = x^{(k-1)}+t_{k-1}v^{(k-1)}$
+        \item $t_{k-1} = \frac{\langle v^{(k-1)},\, b - Ax^{(k-1)}\rangle}{\langle v^{(k-1)},\, Av^{(k-1)} \rangle}$
+        \item $v^{(k-1)} = -\frac{d}{dx} q(x^{(k-1)})$
+        \item $q(x) = \langle x^,\, Ax \rangle - 2 \langle x,\, b \rangle$
+    \ei
+\end{frame}
+
+
+\begin{frame}{Indirect Methods: Conjugate Gradient}
+    Method
+    \bi
+        \item Conjugate Gradient
+    \ei
+    System Stipulations
+    \bi
+        \item $A$ invertible
+        \item $A$ symmetric, positive definite
+    \ei
+    Iteration Formula
+    \bi
+        \item $x^{(k)} = x^{(k-1)}+t_{k-1}v^{(k-1)}$
+        \item $t_{k-1} = \frac{\langle v^{(k-1)},\, b - Ax^{(k-1)}\rangle}{\langle v^{(k-1)},\, Av^{(k-1)} \rangle}$
+        \item $\left\{v^{(0)},\ldots,v^{(n)}\right\}$ are $A$-orthogonal
+        \item $v^{(k-1)} = -\frac{d}{dx} q(x^{(k-1)})$
+        \item $q(x) = \langle x^,\, Ax \rangle - 2 \langle x,\, b \rangle$
+    \ei
+\end{frame}
+
 \end{document}
