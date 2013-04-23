@@ -157,7 +157,7 @@
 
 
 %PIVOTING EXAMPLE WITH PERMUTATION MATRIX
-\begin{frame}{Direct Methods: Pivoting Examples}
+\begin{frame}{Direct Methods: Scaled Partial Pivoting Example}
     \begin{columns}
     \column{.35\textwidth}
         \only<1-2>{
@@ -198,7 +198,7 @@
 
     \column{.65\textwidth}
         \begin{algorithmic}[1]
-            \Function{GE\_PP}{$n, (a_{ij}), (p_{i})$}
+            \Function{GE\_SPP}{$n, (a_{ij}), (p_{i})$}
                 \For{$k = 1 \textbf{ to } n-1$}
                     \For{$i = k + 1 \textbf{ to } n$}
                         \Let{$z$}{$a_{p_ik}/a_{p_kk}$}
@@ -226,7 +226,7 @@
 \end{frame}
 
 
-\begin{frame}{Iterative Methods}
+\begin{frame}{Indirect Methods}
     \pause
     Recall: General Conditions for Iterative Method Convergence \pause
         \begin{theorem}
@@ -373,8 +373,8 @@
     \bi
         \item $x^{(k)} = x^{(k-1)}+t_{k-1}v^{(k-1)}$
         \item $t_{k-1} = \frac{\langle v^{(k-1)},\, b - Ax^{(k-1)}\rangle}{\langle v^{(k-1)},\, Av^{(k-1)} \rangle}$
-        \item $v^{(k-1)} = -\frac{d}{dx} q(x^{(k-1)})$
-        \item $q(x) = \langle x^,\, Ax \rangle - 2 \langle x,\, b \rangle$
+        \item $v^{(k-1)} = -\nabla x^{(k-1)} = -\frac{d}{dx} q(x^{(k-1)})$
+        \item $q(x) = \langle x,\, Ax \rangle - 2 \langle x,\, b \rangle$
     \ei
 \end{frame}
 
@@ -394,8 +394,8 @@
         \item $x^{(k)} = x^{(k-1)}+t_{k-1}v^{(k-1)}$
         \item $t_{k-1} = \frac{\langle v^{(k-1)},\, b - Ax^{(k-1)}\rangle}{\langle v^{(k-1)},\, Av^{(k-1)} \rangle}$
         \item $\left\{v^{(0)},\ldots,v^{(n)}\right\}$ are $A$-orthogonal
-        \item $v^{(k-1)} = -\frac{d}{dx} q(x^{(k-1)})$
-        \item $q(x) = \langle x^,\, Ax \rangle - 2 \langle x,\, b \rangle$
+        \item $v^{(k-1)} = -\nabla x^{(k-1)} = -\frac{d}{dx} q(x^{(k-1)})$
+        \item $q(x) = \langle x,\, Ax \rangle - 2 \langle x,\, b \rangle$
     \ei
 \end{frame}
 
