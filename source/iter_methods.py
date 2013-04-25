@@ -65,7 +65,7 @@ def jacobi(A,b,x0,M,eps):
     return x_new, e
 
 
-def richardson(A,b,x0,M,eps):
+def richardson(A,b,x0,M,eps,omega=1):
     if A.shape[0] != A.shape[1]:
         raise InvalidDimensionError
 
@@ -83,9 +83,9 @@ def richardson(A,b,x0,M,eps):
     while k < M:
         # compute the residuals
         for i in xrange(A.shape[0]):
-            r[i] = b[i] - np.sum(A[i,:]*x_new[i])
+            r[i] = b[i] - np.sum(A[i,:]*x_new)
         # calculate the next iterate 
-        x_new = x_old + r
+        x_new = x_old + omega*r
         # append the error to the list
         e.append(fabs(la.norm(x_new-x_old)))
         # check stopping criterion
@@ -101,9 +101,13 @@ def richardson(A,b,x0,M,eps):
 
 if __name__ == '__main__':
     # test Richardson method
-    A = np.array([[1,0.5,0.33],[0.33,1,0.5],[0.5,0.33,1]])
-    b = np.array([0.61,0.61,0.61])
+    A = np.array([[6,1,1],[2,4,0],[1,2,6]])
+    b = np.array([12,0,6])
     x0 = np.zeros((3))
+    om = 1.0/6.0
+#    A = np.array([[1,0.5,0.33],[0.33,1,0.5],[0.5,0.33,1]])
+#    b = np.array([0.61,0.61,0.61])
+#    x0 = np.zeros((3))
 
     print 'A ='
     print A
@@ -112,7 +116,7 @@ if __name__ == '__main__':
     print
     
     print "Richardson method:"
-    x, e = richardson(A,b,x0,100,0.0001)
+    x, e = richardson(A,b,x0,100,0.0001,omega=om)
     print "\tNumber of iterations:", len(e)
     print "\tx_"+str(len(e))+" = ", x
     print "\te = ", e[-1]
