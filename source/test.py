@@ -49,9 +49,9 @@ def main():
     print "\te = ", e[-1]
 
     # test gradient descent and conjugate gradient methods
-    A = np.array([[1,5],[7,9]])
-    b = np.array([2,6])
-    x0 = np.zeros((2))
+    A = np.array([[2,-1],[-1,2]])
+    b = np.array([1,0])
+    x0 = np.array([0,0])
 
     print
     print 'A ='
@@ -61,7 +61,13 @@ def main():
     print
 
     print "Gradient descent method:"
-    x, e = lsm.gradient_descent(A,b,x0,100,0.0001)
+    x, e = lsm.gradient_descent(A, b, x0, 200, 1e-4)
+    print "\tNumber of iterations:", len(e)
+    print "\tx_"+str(len(e))+" = ", x
+    print "\te = ", e[-1]
+    
+    print "Conjugate gradient method:"
+    x, e = lsm.conjugate_gradient(A, b, x0, 200, 1e-4, 1e-4)
     print "\tNumber of iterations:", len(e)
     print "\tx_"+str(len(e))+" = ", x
     print "\te = ", e[-1]

@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-from math import fabs
+from math import fabs, sqrt
 import numpy as np
 import numpy.linalg as la
 
@@ -24,6 +24,45 @@ def is_symmetric(A):
 
 ### Methods for solving linear systems ###
 
+def conjugate_gradient(A,b,x0,M,eps,delta):
+    if A.shape[0] != A.shape[1]:
+        raise InvalidDimensionError
+
+    # inital values
+    x = np.copy(x0)
+    r = b - A.dot(x)
+    v = np.copy(r)
+    c = inner_product(r,r)
+    # list of errors
+    e = []
+    # iteration number
+    k = 0
+
+    while k < M:
+        # stop if v^k is sufficiently close to 0
+        if sqrt(inner_product(v,v)) < delta:
+            break
+        # compute and store intermediate computations
+        z = A.dot(v)
+        t = c / inner_product(v,z)
+        # compute new values
+        x = x + t*v
+        r = r - t*z
+        d = inner_product(r,r)
+        # stop if r^k is sufficiently close to 0
+        if d < eps:
+            break
+        # append the error to the list
+        e.append(d)
+        # update results
+        v = r + (d/c)*v
+        c = d
+        # advance
+        k += 1
+    
+    return x, e
+
+
 # solve the system Ax = b by equivalently solving
 # the quadratic optimization problem:
 #   min ||Ax - b||^2
@@ -37,7 +76,7 @@ def gradient_descent(A,b,x0,M,eps):
     # criterion ||x^k - x^{k-1}|| < eps
     x_old = np.copy(x0)
     x_new = np.copy(x_old)
-    # list of errors as their computed
+    # list of errors
     e = []
     # iteration number
     k = 0
@@ -52,8 +91,10 @@ def gradient_descent(A,b,x0,M,eps):
         # append the error to the list
         e.append(fabs(la.norm(x_new-x_old)))
         # check stopping criterion
-        if fabs(la.norm(x_new-x_old)) < eps:
+        if inner_product(r,r) < eps:
             break
+#        if fabs(la.norm(x_new-x_old)) < eps:
+#            break
         # save new copy
         x_old = np.copy(x_new)
         # advance
@@ -70,7 +111,7 @@ def gauss_seidel(A,b,x0,M,eps):
     # criterion ||x_k - x_{k-1}|| < eps
     x_old = np.copy(x0)
     x_new = np.copy(x_old)
-    # list of errors as their computed
+    # list of errors
     e = []
     # iteration number
     k = 0
@@ -101,7 +142,7 @@ def jacobi(A,b,x0,M,eps):
     # criterion ||x_k - x_{k-1}|| < eps
     x_old = np.copy(x0)
     x_new = np.zeros(b.shape, dtype=float)
-    # list of errors as their computed
+    # list of errors
     e = []
     # iteration number
     k = 0
@@ -133,7 +174,7 @@ def richardson(A,b,x0,M,eps,omega=1):
     x_new = np.copy(x_old)
     # residuals
     r = np.zeros(x_old.shape[0])
-    # list of errors as their computed
+    # list of errors
     e = []
     # iteration number
     k = 0
