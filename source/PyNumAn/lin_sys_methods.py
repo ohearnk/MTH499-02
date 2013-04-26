@@ -4,59 +4,77 @@ from math import fabs, sqrt
 import numpy as np
 import numpy.linalg as la
 
-### Auxilary methods ###
 
-# real-valued inner-product
-def inner_product(x,y):
-    return np.sum(x.dot(y))
-
-
-def is_symmetric(A):
-    for i in xrange(A.shape[0]):
-        for j in range(i+1,A.shape[0]):
-            if A[i,j] != A[j,i]:
-                return False
-    return True
-
-# TODO: implement Cholesky factorization for 
-# checking if a matrix is positive definite
-
-
-### Methods for solving linear systems ###
-
+# iterate using the conjugate directions
 def conjugate_gradient(A,b,x0,M,eps,delta):
     if A.shape[0] != A.shape[1]:
         raise InvalidDimensionError
 
-    # inital values
+    # initial values
     x = np.copy(x0)
-    r = b - A.dot(x)
+    r = b - np.dot(A,x)
     v = np.copy(r)
-    c = inner_product(r,r)
+    c = np.dot(r,r)
     # list of errors
     e = []
     # iteration number
     k = 0
 
     while k < M:
-        # stop if v^k is sufficiently close to 0
-        if sqrt(inner_product(v,v)) < delta:
+        if sqrt(np.dot(v,v)) < delta:
             break
-        # compute and store intermediate computations
-        z = A.dot(v)
-        t = c / inner_product(v,z)
-        # compute new values
+        # save intermediate computations (trade space for compute time)
+        z = np.dot(A,v)
+        # compute the scalar applied to the descent vector
+        t = float(c) / np.dot(v,z)
+        # compute the next iterate and residual
         x = x + t*v
         r = r - t*z
-        d = inner_product(r,r)
-        # stop if r^k is sufficiently close to 0
-        if d < eps:
-            break
+        # compute the inner product of r^k
+        d = np.dot(r,r)
         # append the error to the list
         e.append(d)
+        # check stopping criterion
+        if d < eps:
+            break
         # update results
-        v = r + (d/c)*v
+        v = r + (float(d)/c)*v
         c = d
+        # advance
+        k += 1
+    return x, e
+
+
+# fixed number of iterations using the conjugate directions
+def conjugate_gradient_direct(A,b,x0,eps):
+    if A.shape[0] != A.shape[1]:
+        raise InvalidDimensionError
+
+    # inital values
+    x = np.copy(x0)
+    r = b - np.dot(A,x)
+    v = np.copy(r)
+    # list of errors
+    e = []
+    # iteration number
+    k = 0
+
+    while k < A.shape[0]:
+        # compute new values
+        u = np.dot(A,v)
+        t = float(np.dot(v,r)) / np.dot(v,u)
+        x = x + t*v
+        r = b - np.dot(A,x)
+        # compute the norm of r^k
+        d = la.norm(r)
+        # append the error to the list
+        e.append(d)
+        # stop if residual norm is sufficiently small
+        if d < eps:
+            break
+        # update results
+        s = -np.dot(r,u) / np.dot(v,u)
+        v = r + s*v
         # advance
         k += 1
     
@@ -72,10 +90,8 @@ def gradient_descent(A,b,x0,M,eps):
     if A.shape[0] != A.shape[1]:
         raise InvalidDimensionError
 
-    # x^k and x^{k-1} for computing the stopping
-    # criterion ||x^k - x^{k-1}|| < eps
-    x_old = np.copy(x0)
-    x_new = np.copy(x_old)
+    # inital guess
+    x = np.copy(x0)
     # list of errors
     e = []
     # iteration number
@@ -83,24 +99,22 @@ def gradient_descent(A,b,x0,M,eps):
 
     while k < M:
         # compute the residual
-        r = b - A.dot(x_old)
+        r = b - A.dot(x)
         # compute the scalar applied to the descent vector
-        t = inner_product(r,r) / inner_product(r,A.dot(r))
+        t = float(r.dot(r)) / r.dot(A.dot(r))
         # compute the next iterate
-        x_new = x_old + t*r
+        x = x + t*r
+        # stop if the residual norm is sufficiently small
+        d = la.norm(r)
         # append the error to the list
-        e.append(fabs(la.norm(x_new-x_old)))
+        e.append(r)
         # check stopping criterion
-        if inner_product(r,r) < eps:
+        if d < eps:
             break
-#        if fabs(la.norm(x_new-x_old)) < eps:
-#            break
-        # save new copy
-        x_old = np.copy(x_new)
         # advance
         k += 1
     
-    return x_new, e
+    return x, e
 
 
 def gauss_seidel(A,b,x0,M,eps):
@@ -120,7 +134,7 @@ def gauss_seidel(A,b,x0,M,eps):
         # compute the next iterate
         for i in xrange(A.shape[0]):
             # use the new values as soon as you're computed
-            x_new[i] = (b[i] - np.sum(np.delete(A[i,:],i).dot(np.delete(x_new,i)))) / A[i,i]
+            x_new[i] = (b[i] - np.sum(np.delete(A[i,:],i).dot(np.delete(x_new,i)))) / float(A[i,i])
         # append the error to the list
         e.append(fabs(la.norm(x_new-x_old)))
         # check stopping criterion
@@ -150,7 +164,7 @@ def jacobi(A,b,x0,M,eps):
     while k < M:
         # compute the next iterate
         for i in xrange(A.shape[0]):
-            x_new[i] = (b[i] - np.sum(np.delete(A[i,:],i).dot(np.delete(x_old,i)))) / A[i,i]
+            x_new[i] = (b[i] - np.sum(np.delete(A[i,:],i).dot(np.delete(x_old,i)))) / float(A[i,i])
         # append the error to the list
         e.append(fabs(la.norm(x_new-x_old)))
         # check stopping criterion

@@ -1,13 +1,10 @@
+from matplotlib import pyplot
 import numpy as np
 
 import PyNumAn.lin_sys_methods as lsm
 
 def main():
     # test Richardson method
-#    A = np.array([[6,1,1],[2,4,0],[1,2,6]])
-#    b = np.array([12,0,6])
-#    x0 = np.zeros((3))
-#    om = 1.0/6.0
     A = np.array([[1,0.5,0.33],[0.33,1,0.5],[0.5,0.33,1]])
     b = np.array([0.61,0.61,0.61])
     x0 = np.zeros((3))
@@ -50,9 +47,9 @@ def main():
     print "\te = ", e[-1]
 
     # test gradient descent and conjugate gradient methods
-    A = np.array([[2,-1],[-1,2]])
-    b = np.array([1,0])
-    x0 = np.array([0,0])
+    A = np.array([[4,-1,1],[-1,4,-2],[1,-2,4]])
+    b = np.array([12,-1,5])
+    x0 = np.array([0,0,0])
 
     print
     print 'A ='
@@ -67,6 +64,12 @@ def main():
     print "\tx_"+str(len(e))+" = ", x
     print "\te = ", e[-1]
     
+    print "Direct Conjugate gradient method:"
+    x, e = lsm.conjugate_gradient_direct(A, b, x0, 1e-4)
+    print "\tNumber of iterations:", len(e)
+    print "\tx_"+str(len(e))+" = ", x
+    print "\te = ", e[-1]
+
     print "Conjugate gradient method:"
     x, e = lsm.conjugate_gradient(A, b, x0, 200, 1e-4, 1e-4)
     print "\tNumber of iterations:", len(e)
