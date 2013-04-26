@@ -1,5 +1,6 @@
 import numpy as np
-import lin_sys_methods as lsm
+
+import PyNumAn.lin_sys_methods as lsm
 
 def main():
     # test Richardson method
